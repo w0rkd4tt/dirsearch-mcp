@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "report_version": "1.0",
+    "generated_at": "2025-06-12T09:25:15.723812",
+    "generator": "DirsearchMCP"
+  },
+  "scan_info": {
+    "target_url": "https://example.com",
+    "target_domain": "example.com",
+    "start_time": "2025-06-12T09:25:15.661871",
+    "end_time": "2025-06-12T09:25:15.723124",
+    "duration": 0.061253,
+    "intelligence_mode": "LOCAL"
+  },
+  "target_analysis": {
+    "server_type": "Unknown",
+    "technology_stack": [],
+    "detected_cms": null,
+    "security_headers": {}
+  },
+  "mcp_decisions": [],
+  "scan_plan": [],
+  "scan_results": [
+    {
+      "task_id": "cli_scan",
+      "status": "completed",
+      "findings": [],
+      "metrics": {
+        "total_requests": 4744,
+        "found_paths": 0,
+        "errors": 0,
+        "filtered": 0,
+        "start_time": "2025-06-12T09:25:15.661871",
+        "end_time": "2025-06-12T09:25:15.723124",
+        "duration": 0.061253,
+        "requests_per_second": 79704.29279977568
+      },
+      "timestamp": "2025-06-12T09:25:15.723124"
+    }
+  ],
+  "findings_summary": {
+    "total_findings": 0,
+    "by_status": {},
+    "interesting_paths": [],
+    "potential_vulnerabilities": []
+  },
+  "performance_metrics": {
+    "total_requests": 4744,
+    "found_paths": 0,
+    "errors": 0,
+    "requests_per_second": 79704.29279977568
+  },
+  "recommendations": [
+    {
+      "priority": "Medium",
+      "category": "Security Headers",
+      "recommendation": "Implement security headers",
+      "details": "Consider implementing security headers like X-Frame-Options, X-Content-Type-Options, and Content-Security-Policy."
+    }
+  ]
+}

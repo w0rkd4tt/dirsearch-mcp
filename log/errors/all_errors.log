@@ -1,0 +1,5 @@
+2025-06-11 23:13:33,542 - __main__ - [31mERROR[0m - run_direct_scan:484 - Error scanning https://example.com: DirsearchEngine.scan_target() got an unexpected keyword argument 'base_url'
+2025-06-11 23:17:52,717 - __main__ - [31mERROR[0m - run_direct_scan:490 - Error scanning https://example.com: DirsearchEngine.scan_target() got an unexpected keyword argument 'base_url'
+2025-06-12 09:00:14,587 - __main__ - [31mERROR[0m - run_direct_scan:490 - Error scanning https://example.com: 'NoneType' object has no attribute 'replace'
+2025-06-12 09:25:03,532 - __main__ - [31mERROR[0m - run_direct_scan:491 - Error scanning https://example.com: 'NoneType' object has no attribute 'replace'
+2025-06-12 09:25:15,724 - __main__ - [31mERROR[0m - run_direct_scan:491 - Error scanning https://example.com: 'NoneType' object has no attribute 'replace'

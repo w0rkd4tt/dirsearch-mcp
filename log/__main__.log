@@ -1,0 +1,99 @@
+2025-06-11 23:13:32,715 - __main__ - [32mINFO[0m - run_direct_scan:331 - Starting Dirsearch MCP v1.0.0
+2025-06-11 23:13:32,716 - __main__ - [32mINFO[0m - run_direct_scan:344 - MCP Intelligence Mode: LOCAL
+2025-06-11 23:13:32,716 - __main__ - [32mINFO[0m - run_direct_scan:366 - 
+Scanning target: https://example.com
+2025-06-11 23:13:32,716 - __main__ - [32mINFO[0m - run_direct_scan:370 - Analyzing target...
+2025-06-11 23:13:33,541 - __main__ - [32mINFO[0m - run_direct_scan:374 - Server: Unknown
+2025-06-11 23:13:33,542 - __main__ - [32mINFO[0m - run_direct_scan:375 - Technologies: 
+2025-06-11 23:13:33,542 - __main__ - [32mINFO[0m - run_direct_scan:381 - Generating optimized scan plan...
+2025-06-11 23:13:33,542 - __main__ - [32mINFO[0m - run_direct_scan:401 - Starting scan with 10 threads...
+2025-06-11 23:13:33,542 - __main__ - [31mERROR[0m - run_direct_scan:484 - Error scanning https://example.com: DirsearchEngine.scan_target() got an unexpected keyword argument 'base_url'
+2025-06-11 23:13:33,542 - __main__ - [32mINFO[0m - run_direct_scan:489 - 
+All scans completed
+2025-06-11 23:17:52,037 - __main__ - [32mINFO[0m - run_direct_scan:337 - Starting Dirsearch MCP v1.0.0
+2025-06-11 23:17:52,037 - __main__ - [32mINFO[0m - run_direct_scan:350 - MCP Intelligence Mode: LOCAL
+2025-06-11 23:17:52,037 - __main__ - [32mINFO[0m - run_direct_scan:372 - 
+Scanning target: https://example.com
+2025-06-11 23:17:52,038 - __main__ - [32mINFO[0m - run_direct_scan:376 - Analyzing target...
+2025-06-11 23:17:52,715 - __main__ - [32mINFO[0m - run_direct_scan:380 - Server: Unknown
+2025-06-11 23:17:52,716 - __main__ - [32mINFO[0m - run_direct_scan:381 - Technologies: 
+2025-06-11 23:17:52,716 - __main__ - [32mINFO[0m - run_direct_scan:387 - Generating optimized scan plan...
+2025-06-11 23:17:52,716 - __main__ - [32mINFO[0m - run_direct_scan:407 - Starting scan with 10 threads...
+2025-06-11 23:17:52,717 - __main__ - [31mERROR[0m - run_direct_scan:490 - Error scanning https://example.com: DirsearchEngine.scan_target() got an unexpected keyword argument 'base_url'
+2025-06-11 23:17:52,718 - __main__ - [32mINFO[0m - run_direct_scan:495 - 
+All scans completed
+2025-06-12 09:00:13,573 - __main__ - [32mINFO[0m - run_direct_scan:337 - Starting Dirsearch MCP v1.0.0
+2025-06-12 09:00:13,575 - __main__ - [32mINFO[0m - run_direct_scan:350 - MCP Intelligence Mode: LOCAL
+2025-06-12 09:00:13,575 - __main__ - [32mINFO[0m - run_direct_scan:372 - 
+Scanning target: https://example.com
+2025-06-12 09:00:13,575 - __main__ - [32mINFO[0m - run_direct_scan:376 - Analyzing target...
+2025-06-12 09:00:14,523 - __main__ - [32mINFO[0m - run_direct_scan:380 - Server: Unknown
+2025-06-12 09:00:14,523 - __main__ - [32mINFO[0m - run_direct_scan:381 - Technologies: 
+2025-06-12 09:00:14,523 - __main__ - [32mINFO[0m - run_direct_scan:407 - Starting scan with 10 threads...
+2025-06-12 09:00:14,586 - __main__ - [32mINFO[0m - run_direct_scan:437 - 
+Scan completed:
+2025-06-12 09:00:14,587 - __main__ - [32mINFO[0m - run_direct_scan:438 - Total requests: 4744
+2025-06-12 09:00:14,587 - __main__ - [32mINFO[0m - run_direct_scan:439 - Found paths: 0
+2025-06-12 09:00:14,587 - __main__ - [32mINFO[0m - run_direct_scan:440 - Errors: 0
+2025-06-12 09:00:14,587 - __main__ - [32mINFO[0m - run_direct_scan:450 - 
+Generating all report...
+2025-06-12 09:00:14,587 - __main__ - [31mERROR[0m - run_direct_scan:490 - Error scanning https://example.com: 'NoneType' object has no attribute 'replace'
+2025-06-12 09:00:14,588 - __main__ - [32mINFO[0m - run_direct_scan:495 - 
+All scans completed
+2025-06-12 09:25:02,628 - __main__ - [32mINFO[0m - run_direct_scan:338 - Starting Dirsearch MCP v1.0.0
+2025-06-12 09:25:02,629 - __main__ - [32mINFO[0m - run_direct_scan:351 - MCP Intelligence Mode: LOCAL
+2025-06-12 09:25:02,629 - __main__ - [32mINFO[0m - run_direct_scan:373 - 
+Scanning target: https://example.com
+2025-06-12 09:25:02,629 - __main__ - [32mINFO[0m - run_direct_scan:377 - Analyzing target...
+2025-06-12 09:25:03,458 - __main__ - [32mINFO[0m - run_direct_scan:381 - Server: Unknown
+2025-06-12 09:25:03,459 - __main__ - [32mINFO[0m - run_direct_scan:382 - Technologies: 
+2025-06-12 09:25:03,459 - __main__ - [32mINFO[0m - run_direct_scan:408 - Starting scan with 10 threads...
+2025-06-12 09:25:03,531 - __main__ - [32mINFO[0m - run_direct_scan:438 - 
+Scan completed:
+2025-06-12 09:25:03,531 - __main__ - [32mINFO[0m - run_direct_scan:439 - Total requests: 4744
+2025-06-12 09:25:03,531 - __main__ - [32mINFO[0m - run_direct_scan:440 - Found paths: 0
+2025-06-12 09:25:03,531 - __main__ - [32mINFO[0m - run_direct_scan:441 - Errors: 0
+2025-06-12 09:25:03,531 - __main__ - [32mINFO[0m - run_direct_scan:451 - 
+Generating all report...
+2025-06-12 09:25:03,532 - __main__ - [31mERROR[0m - run_direct_scan:491 - Error scanning https://example.com: 'NoneType' object has no attribute 'replace'
+2025-06-12 09:25:03,532 - __main__ - [32mINFO[0m - run_direct_scan:496 - 
+All scans completed
+2025-06-12 09:25:15,058 - __main__ - [32mINFO[0m - run_direct_scan:338 - Starting Dirsearch MCP v1.0.0
+2025-06-12 09:25:15,059 - __main__ - [32mINFO[0m - run_direct_scan:351 - MCP Intelligence Mode: LOCAL
+2025-06-12 09:25:15,059 - __main__ - [32mINFO[0m - run_direct_scan:373 - 
+Scanning target: https://example.com
+2025-06-12 09:25:15,059 - __main__ - [32mINFO[0m - run_direct_scan:377 - Analyzing target...
+2025-06-12 09:25:15,661 - __main__ - [32mINFO[0m - run_direct_scan:381 - Server: Unknown
+2025-06-12 09:25:15,661 - __main__ - [32mINFO[0m - run_direct_scan:382 - Technologies: 
+2025-06-12 09:25:15,661 - __main__ - [32mINFO[0m - run_direct_scan:408 - Starting scan with 10 threads...
+2025-06-12 09:25:15,723 - __main__ - [32mINFO[0m - run_direct_scan:438 - 
+Scan completed:
+2025-06-12 09:25:15,723 - __main__ - [32mINFO[0m - run_direct_scan:439 - Total requests: 4744
+2025-06-12 09:25:15,723 - __main__ - [32mINFO[0m - run_direct_scan:440 - Found paths: 0
+2025-06-12 09:25:15,723 - __main__ - [32mINFO[0m - run_direct_scan:441 - Errors: 0
+2025-06-12 09:25:15,723 - __main__ - [32mINFO[0m - run_direct_scan:451 - 
+Generating all report...
+2025-06-12 09:25:15,724 - __main__ - [31mERROR[0m - run_direct_scan:491 - Error scanning https://example.com: 'NoneType' object has no attribute 'replace'
+2025-06-12 09:25:15,725 - __main__ - [32mINFO[0m - run_direct_scan:496 - 
+All scans completed
+2025-06-12 09:32:38,798 - __main__ - [32mINFO[0m - run_direct_scan:338 - Starting Dirsearch MCP v1.0.0
+2025-06-12 09:32:38,800 - __main__ - [32mINFO[0m - run_direct_scan:351 - MCP Intelligence Mode: LOCAL
+2025-06-12 09:32:38,800 - __main__ - [32mINFO[0m - run_direct_scan:373 - 
+Scanning target: https://example.com
+2025-06-12 09:32:38,800 - __main__ - [32mINFO[0m - run_direct_scan:377 - Analyzing target...
+2025-06-12 09:32:39,517 - __main__ - [32mINFO[0m - run_direct_scan:381 - Server: Unknown
+2025-06-12 09:32:39,517 - __main__ - [32mINFO[0m - run_direct_scan:382 - Technologies: 
+2025-06-12 09:32:39,517 - __main__ - [32mINFO[0m - run_direct_scan:408 - Starting scan with 10 threads...
+2025-06-12 09:32:39,587 - __main__ - [32mINFO[0m - run_direct_scan:438 - 
+Scan completed:
+2025-06-12 09:32:39,587 - __main__ - [32mINFO[0m - run_direct_scan:439 - Total requests: 4744
+2025-06-12 09:32:39,587 - __main__ - [32mINFO[0m - run_direct_scan:440 - Found paths: 0
+2025-06-12 09:32:39,587 - __main__ - [32mINFO[0m - run_direct_scan:441 - Errors: 0
+2025-06-12 09:32:39,587 - __main__ - [32mINFO[0m - run_direct_scan:451 - 
+Generating all report...
+2025-06-12 09:32:39,588 - __main__ - [32mINFO[0m - run_direct_scan:486 - Reports saved:
+2025-06-12 09:32:39,588 - __main__ - [32mINFO[0m - run_direct_scan:488 -   JSON: report/json/scan_report_example.com_20250612_093239.json
+2025-06-12 09:32:39,588 - __main__ - [32mINFO[0m - run_direct_scan:488 -   HTML: report/html/scan_report_example.com_20250612_093239.html
+2025-06-12 09:32:39,588 - __main__ - [32mINFO[0m - run_direct_scan:488 -   MARKDOWN: report/markdown/scan_report_example.com_20250612_093239.md
+2025-06-12 09:32:39,588 - __main__ - [32mINFO[0m - run_direct_scan:496 - 
+All scans completed

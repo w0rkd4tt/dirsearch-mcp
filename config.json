@@ -1,0 +1,22 @@
+{
+  "wordlists": {
+    "default": "/Users/datnlq/SecLists/Discovery/Web-Content/common.txt",
+    "paths": {
+      "seclists_common": "/Users/datnlq/SecLists/Discovery/Web-Content/common.txt",
+      "seclists_big": "/Users/datnlq/SecLists/Discovery/Web-Content/big.txt",
+      "seclists_medium": "/Users/datnlq/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt",
+      "seclists_small": "/Users/datnlq/SecLists/Discovery/Web-Content/directory-list-2.3-small.txt",
+      "seclists_php": "/Users/datnlq/SecLists/Discovery/Web-Content/PHP.fuzz.txt",
+      "seclists_apache": "/Users/datnlq/SecLists/Discovery/Web-Content/apache.txt",
+      "seclists_nginx": "/Users/datnlq/SecLists/Discovery/Web-Content/nginx.txt"
+    }
+  },
+  "scan_defaults": {
+    "threads": 20,
+    "timeout": 10,
+    "extensions": ["php", "html", "js", "txt", "asp", "aspx", "jsp"],
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    "follow_redirects": true,
+    "exclude_status": "404"
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "metadata": {
+    "report_version": "1.0",
+    "generated_at": "2025-06-12T10:24:17.424838",
+    "generator": "DirsearchMCP"
+  },
+  "scan_info": {
+    "target_url": "http://testphp.vulnweb.com/",
+    "target_domain": "testphp.vulnweb.com",
+    "start_time": "2025-06-12T10:14:29.306274",
+    "end_time": "2025-06-12T10:22:47.194126",
+    "duration": 497.88816380500793,
+    "intelligence_mode": "LOCAL"
+  },
+  "target_analysis": {
+    "url": "http://testphp.vulnweb.com/",
+    "domain": "testphp.vulnweb.com",
+    "server_type": "nginx/1.19.0",
+    "technology_stack": [
+      "PHP/5.6.40-38+ubuntu20.04.1+deb.sury.org+1"
+    ],
+    "response_patterns": {
+      "status_code": 200,
+      "content_length": 4958,
+      "has_title": true,
+      "has_forms": true
+    },
+    "security_headers": {},
+    "detected_cms": null
+  },
+  "mcp_decisions": [],
+  "scan_plan": [
+    {
+      "task_id": "custom_scan",
+      "task_type": "directory_enumeration",
+      "priority": 100,
+      "parameters": {
+        "wordlist": "common.txt",
+        "extensions": [
+          "php",
+          "html",
+          "js",
+          "txt"
+        ],
+        "threads": 20,
+        "timeout": 10,
+        "follow_redirects": true,
+        "exclude_status": "404",
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      },
+      "dependencies": []
+    }
+  ],
+  "scan_results": [
+    {
+      "path": "categories.php",
+      "url": "http://testphp.vulnweb.com/categories.php",
+      "status": 200,
+      "size": 6115,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5513317584991455,
+      "redirect": ""
+    },
+    {
+      "path": "product.php",
+      "url": "http://testphp.vulnweb.com/product.php",
+      "status": 200,
+      "size": 5056,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.47408413887023926,
+      "redirect": ""
+    },
+    {
+      "path": "guestbook.php",
+      "url": "http://testphp.vulnweb.com/guestbook.php",
+      "status": 200,
+      "size": 5390,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5595383644104004,
+      "redirect": ""
+    },
+    {
+      "path": "login.php",
+      "url": "http://testphp.vulnweb.com/login.php",
+      "status": 200,
+      "size": 5523,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5196762084960938,
+      "redirect": ""
+    },
+    {
+      "path": "cgi-bin.html",
+      "url": "http://testphp.vulnweb.com/cgi-bin.html",
+      "status": 403,
+      "size": 276,
+      "content_type": "text/html; charset=iso-8859-1",
+      "response_time": 0.5283288955688477,
+      "redirect": ""
+    },
+    {
+      "path": "search.php",
+      "url": "http://testphp.vulnweb.com/search.php",
+      "status": 200,
+      "size": 4732,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5325331687927246,
+      "redirect": ""
+    },
+    {
+      "path": "disclaimer.php",
+      "url": "http://testphp.vulnweb.com/disclaimer.php",
+      "status": 200,
+      "size": 5524,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5108189582824707,
+      "redirect": ""
+    },
+    {
+      "path": "artists.php",
+      "url": "http://testphp.vulnweb.com/artists.php",
+      "status": 200,
+      "size": 5328,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5188329219818115,
+      "redirect": ""
+    },
+    {
+      "path": "cart.php",
+      "url": "http://testphp.vulnweb.com/cart.php",
+      "status": 200,
+      "size": 4903,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5154590606689453,
+      "redirect": ""
+    },
+    {
+      "path": "404.php",
+      "url": "http://testphp.vulnweb.com/404.php",
+      "status": 200,
+      "size": 5265,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5569090843200684,
+      "redirect": ""
+    },
+    {
+      "path": "logout.php",
+      "url": "http://testphp.vulnweb.com/logout.php",
+      "status": 200,
+      "size": 4830,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5242519378662109,
+      "redirect": ""
+    },
+    {
+      "path": "cgi-bin/.html",
+      "url": "http://testphp.vulnweb.com/cgi-bin/.html",
+      "status": 403,
+      "size": 276,
+      "content_type": "text/html; charset=iso-8859-1",
+      "response_time": 0.5245840549468994,
+      "redirect": ""
+    },
+    {
+      "path": "signup.php",
+      "url": "http://testphp.vulnweb.com/signup.php",
+      "status": 200,
+      "size": 6033,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5203101634979248,
+      "redirect": ""
+    },
+    {
+      "path": "userinfo.php",
+      "url": "http://testphp.vulnweb.com/userinfo.php",
+      "status": 200,
+      "size": 5523,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.8423547744750977,
+      "redirect": ""
+    },
+    {
+      "path": "index.php",
+      "url": "http://testphp.vulnweb.com/index.php",
+      "status": 200,
+      "size": 4958,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.5278060436248779,
+      "redirect": ""
+    }
+  ],
+  "findings_summary": {
+    "total_findings": 0,
+    "by_status": {},
+    "interesting_paths": [],
+    "potential_vulnerabilities": []
+  },
+  "performance_metrics": {},
+  "recommendations": [
+    {
+      "priority": "Medium",
+      "category": "Security Headers",
+      "recommendation": "Implement security headers",
+      "details": "Consider implementing security headers like X-Frame-Options, X-Content-Type-Options, and Content-Security-Policy."
+    }
+  ]
+}

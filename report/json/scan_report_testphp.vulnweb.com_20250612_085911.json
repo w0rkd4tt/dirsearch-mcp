@@ -1,0 +1,223 @@
+{
+  "metadata": {
+    "report_version": "1.0",
+    "generated_at": "2025-06-12T08:59:11.105980",
+    "generator": "DirsearchMCP"
+  },
+  "scan_info": {
+    "target_url": "http://testphp.vulnweb.com/",
+    "target_domain": "testphp.vulnweb.com",
+    "start_time": "2025-06-12T08:51:22.774225",
+    "end_time": "2025-06-12T08:54:39.560050",
+    "duration": 196.78596711158752,
+    "intelligence_mode": "LOCAL"
+  },
+  "target_analysis": {
+    "url": "http://testphp.vulnweb.com/",
+    "domain": "testphp.vulnweb.com",
+    "server_type": "nginx/1.19.0",
+    "technology_stack": [
+      "PHP/5.6.40-38+ubuntu20.04.1+deb.sury.org+1"
+    ],
+    "response_patterns": {
+      "status_code": 200,
+      "content_length": 4958,
+      "has_title": true,
+      "has_forms": true
+    },
+    "security_headers": {},
+    "detected_cms": null
+  },
+  "mcp_decisions": [],
+  "scan_plan": [
+    {
+      "task_id": "base_scan",
+      "task_type": "directory_enumeration",
+      "priority": 100,
+      "parameters": {
+        "wordlist": "php_common.txt",
+        "extensions": [
+          "htm",
+          "php5",
+          "phtml",
+          "php3",
+          "html",
+          "php",
+          "json",
+          "txt",
+          "xml",
+          "php4"
+        ],
+        "threads": 20,
+        "timeout": 10,
+        "delay": 0
+      },
+      "dependencies": []
+    },
+    {
+      "task_id": "backup_scan",
+      "task_type": "backup_files",
+      "priority": 80,
+      "parameters": {
+        "extensions": [
+          "bak",
+          "old",
+          "backup",
+          "zip",
+          "tar.gz"
+        ],
+        "patterns": [
+          "backup",
+          "old",
+          "copy",
+          "bkp"
+        ],
+        "threads": 5
+      },
+      "dependencies": []
+    }
+  ],
+  "scan_results": [
+    {
+      "path": "admin",
+      "url": "http://testphp.vulnweb.com/admin",
+      "status": 200,
+      "size": 262,
+      "content_type": "text/html",
+      "response_time": 0.6281709671020508,
+      "redirect": ""
+    },
+    {
+      "path": "CVS/Root",
+      "url": "http://testphp.vulnweb.com/CVS/Root",
+      "status": 200,
+      "size": 1,
+      "content_type": "application/octet-stream",
+      "response_time": 0.4103829860687256,
+      "redirect": ""
+    },
+    {
+      "path": "index.php",
+      "url": "http://testphp.vulnweb.com/index.php",
+      "status": 200,
+      "size": 4958,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.4067220687866211,
+      "redirect": ""
+    },
+    {
+      "path": "favicon.ico",
+      "url": "http://testphp.vulnweb.com/favicon.ico",
+      "status": 200,
+      "size": 894,
+      "content_type": "image/x-icon",
+      "response_time": 0.41532182693481445,
+      "redirect": ""
+    },
+    {
+      "path": "CVS/Entries",
+      "url": "http://testphp.vulnweb.com/CVS/Entries",
+      "status": 200,
+      "size": 1,
+      "content_type": "application/octet-stream",
+      "response_time": 0.4189279079437256,
+      "redirect": ""
+    },
+    {
+      "path": "CVS",
+      "url": "http://testphp.vulnweb.com/CVS",
+      "status": 200,
+      "size": 595,
+      "content_type": "text/html",
+      "response_time": 0.6055090427398682,
+      "redirect": ""
+    },
+    {
+      "path": "cgi-bin/",
+      "url": "http://testphp.vulnweb.com/cgi-bin/",
+      "status": 403,
+      "size": 276,
+      "content_type": "text/html; charset=iso-8859-1",
+      "response_time": 0.4058248996734619,
+      "redirect": ""
+    },
+    {
+      "path": "secured",
+      "url": "http://testphp.vulnweb.com/secured",
+      "status": 200,
+      "size": 0,
+      "content_type": "text/html; charset=UTF-8",
+      "response_time": 0.6415648460388184,
+      "redirect": ""
+    },
+    {
+      "path": "cgi-bin",
+      "url": "http://testphp.vulnweb.com/cgi-bin",
+      "status": 403,
+      "size": 276,
+      "content_type": "text/html; charset=iso-8859-1",
+      "response_time": 0.40459299087524414,
+      "redirect": ""
+    },
+    {
+      "path": "images",
+      "url": "http://testphp.vulnweb.com/images",
+      "status": 200,
+      "size": 377,
+      "content_type": "text/html",
+      "response_time": 0.5974869728088379,
+      "redirect": ""
+    },
+    {
+      "path": "pictures",
+      "url": "http://testphp.vulnweb.com/pictures",
+      "status": 200,
+      "size": 2669,
+      "content_type": "text/html",
+      "response_time": 0.6004617214202881,
+      "redirect": ""
+    },
+    {
+      "path": "crossdomain.xml",
+      "url": "http://testphp.vulnweb.com/crossdomain.xml",
+      "status": 200,
+      "size": 224,
+      "content_type": "text/xml",
+      "response_time": 0.403994083404541,
+      "redirect": ""
+    },
+    {
+      "path": "CVS/Repository",
+      "url": "http://testphp.vulnweb.com/CVS/Repository",
+      "status": 200,
+      "size": 8,
+      "content_type": "application/octet-stream",
+      "response_time": 0.45474982261657715,
+      "redirect": ""
+    },
+    {
+      "path": "vendor",
+      "url": "http://testphp.vulnweb.com/vendor",
+      "status": 200,
+      "size": 268,
+      "content_type": "text/html",
+      "response_time": 0.602147102355957,
+      "redirect": ""
+    }
+  ],
+  "findings_summary": {
+    "total_findings": 0,
+    "by_status": {},
+    "interesting_paths": [],
+    "potential_vulnerabilities": []
+  },
+  "performance_metrics": {},
+  "recommendations": [
+    {
+      "priority": "Medium",
+      "category": "Security Headers",
+      "recommendation": "Implement security headers",
+      "details": "Consider implementing security headers like X-Frame-Options, X-Content-Type-Options, and Content-Security-Policy."
+    }
+  ]
+}
