@@ -177,6 +177,23 @@ Examples:
             type=str,
             help='Only include these status codes (comma-separated)'
         )
+        scan_group.add_argument(
+            '-r', '--recursive',
+            action='store_true',
+            default=True,
+            help='Enable recursive scanning (default: True)'
+        )
+        scan_group.add_argument(
+            '--no-recursive',
+            action='store_true',
+            help='Disable recursive scanning'
+        )
+        scan_group.add_argument(
+            '-R', '--recursion-depth',
+            type=int,
+            default=3,
+            help='Maximum recursion depth (default: 3)'
+        )
         
         # MCP options
         mcp_group = parser.add_argument_group('MCP Intelligence options')
@@ -428,7 +445,9 @@ Examples:
                     proxy=args.proxy,
                     max_retries=args.max_retries,
                     exclude_status=args.exclude_status,
-                    include_status=args.include_status
+                    include_status=args.include_status,
+                    recursive=not args.no_recursive,  # True by default, False if --no-recursive
+                    recursion_depth=args.recursion_depth
                 )
                 
                 # Execute scan

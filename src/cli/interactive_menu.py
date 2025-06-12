@@ -471,6 +471,20 @@ class InteractiveMenu:
             default=3,
             choices=[str(i) for i in range(0, 11)]
         )
+        
+        # Recursion configuration
+        self.console.print("\n[bold]Recursion Settings:[/bold]")
+        config['recursive'] = Confirm.ask(
+            "Enable recursive scanning?",
+            default=True
+        )
+        
+        if config['recursive']:
+            config['recursion_depth'] = IntPrompt.ask(
+                "Maximum recursion depth",
+                default=3,
+                choices=[str(i) for i in range(1, 11)]
+            )
     
     async def _configure_mcp_behavior(self, config: Dict[str, Any]):
         """Configure MCP behavior"""
@@ -655,7 +669,9 @@ class InteractiveMenu:
                 proxy=scan_config.get('proxy'),
                 max_retries=scan_config.get('max_retries', 3),
                 exclude_status=scan_config.get('exclude_status', '404'),
-                include_status=scan_config.get('include_status')
+                include_status=scan_config.get('include_status'),
+                recursive=scan_config.get('recursive', True),  # Default to True
+                recursion_depth=scan_config.get('recursion_depth', 3)  # Default to 3
             )
             
             # Real-time progress tracking

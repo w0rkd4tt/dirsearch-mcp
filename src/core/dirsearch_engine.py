@@ -65,6 +65,8 @@ class ScanRequest:
     max_retries: int = 3
     exclude_status: Optional[str] = "404"
     include_status: Optional[str] = None
+    recursive: bool = True  # Default to True for recursive scanning
+    recursion_depth: int = 3  # Default depth of 3 levels
 
 
 @dataclass
@@ -474,18 +476,61 @@ class DirsearchEngine:
             
         # Find directories from results
         directories = [
-            r.path for r in self._results 
+            r for r in self._results 
             if r.is_directory and r.status_code in [200, 301, 302, 403]
         ]
         
+        if not directories:
+            return
+            
+        if self.logger:
+            self.logger.info(f"Found {len(directories)} directories for recursive scan at depth {current_depth + 1}")
+        
         # Scan each directory
-        for directory in directories:
+        for dir_result in directories:
             if self._stop_event.is_set():
                 break
                 
-            new_base_url = urljoin(base_url, directory)
-            # Recursive implementation would go here
-            # This is a placeholder for the recursive logic
+            # Ensure the path ends with /
+            dir_path = dir_result.path
+            if not dir_path.endswith('/'):
+                dir_path += '/'
+                
+            new_base_url = urljoin(base_url, dir_path)
+            
+            if self.logger:
+                self.logger.info(f"Recursive scan: {new_base_url} (depth: {current_depth + 1})")
+            
+            # Generate paths for this subdirectory
+            wordlist = self._get_recursive_wordlist(options)
+            paths = self._generate_paths(wordlist, options)
+            
+            # Filter out already scanned paths
+            new_paths = []
+            for path in paths:
+                full_path = urljoin(new_base_url, path)
+                if full_path not in self._scanned_paths:
+                    new_paths.append(path)
+            
+            if new_paths:
+                # Scan the subdirectory
+                await self._scan_paths(new_base_url, new_paths, options)
+                
+                # Recursively scan any new directories found
+                if current_depth + 1 < options.recursion_depth:
+                    await self._handle_recursive_scan(new_base_url, options, current_depth + 1)
+    
+    def _get_recursive_wordlist(self, options: ScanOptions) -> List[str]:
+        """Get wordlist for recursive scanning (can be different from initial scan)"""
+        # For recursive scans, we might want to use a smaller wordlist
+        # This is a simplified version - you could load a specific recursive wordlist
+        common_dirs = [
+            'admin', 'api', 'backup', 'config', 'data', 'db', 'files', 
+            'images', 'includes', 'js', 'lib', 'logs', 'media', 'scripts',
+            'src', 'static', 'temp', 'test', 'tmp', 'upload', 'uploads',
+            'user', 'users', 'vendor', 'wp-admin', 'wp-content', 'wp-includes'
+        ]
+        return common_dirs
             
     def filter_results(
         self, 
@@ -617,7 +662,9 @@ class DirsearchEngine:
             proxy=scan_request.proxy,
             max_retries=scan_request.max_retries,
             exclude_status_codes=[int(x.strip()) for x in scan_request.exclude_status.split(',')] if scan_request.exclude_status else [404],
-            include_status_codes=[int(x.strip()) for x in scan_request.include_status.split(',')] if scan_request.include_status else None
+            include_status_codes=[int(x.strip()) for x in scan_request.include_status.split(',')] if scan_request.include_status else None,
+            recursive=scan_request.recursive,
+            recursion_depth=scan_request.recursion_depth
         )
         
         # Execute scan

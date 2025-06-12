@@ -53,3 +53,26 @@
 2025-06-12 09:59:57,511 - src.core.mcp_coordinator - [32mINFO[0m - generate_scan_plan:436 - Generating scan plan
 2025-06-12 10:13:40,597 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
 2025-06-12 10:14:29,314 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://testphp.vulnweb.com/
+2025-06-12 10:31:29,917 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 10:31:29,918 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: https://example.com
+2025-06-12 10:54:23,588 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 10:54:23,588 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: 192.168.214.143
+2025-06-12 10:54:28,590 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143: Connection timeout to host http://192.168.214.143
+2025-06-12 10:54:28,591 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://192.168.214.143
+2025-06-12 10:54:33,592 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143: Connection timeout to host http://192.168.214.143
+2025-06-12 10:54:33,593 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: https://192.168.214.143
+2025-06-12 10:54:38,595 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target https://192.168.214.143: Connection timeout to host https://192.168.214.143
+2025-06-12 10:54:38,599 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: 192.168.214.143:8080
+2025-06-12 10:54:43,605 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143:8080: Connection timeout to host http://192.168.214.143:8080
+2025-06-12 10:54:43,606 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://192.168.214.143:8080
+2025-06-12 10:54:48,609 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143:8080: Connection timeout to host http://192.168.214.143:8080
+2025-06-12 10:55:39,571 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 10:55:39,572 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: 192.168.214.143
+2025-06-12 10:55:44,574 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143: Connection timeout to host http://192.168.214.143
+2025-06-12 10:55:44,579 - src.core.mcp_coordinator - [32mINFO[0m - generate_scan_plan:457 - Generating scan plan
+2025-06-12 11:02:14,714 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 11:02:44,481 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://192.168.214.143
+2025-06-12 11:02:49,494 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143: Connection timeout to host http://192.168.214.143
+2025-06-12 11:07:16,004 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 11:07:47,812 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://192.168.214.143
+2025-06-12 11:07:52,819 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143: Connection timeout to host http://192.168.214.143

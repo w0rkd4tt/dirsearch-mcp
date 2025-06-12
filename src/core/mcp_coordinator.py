@@ -283,16 +283,30 @@ class MCPCoordinator:
         """Analyze target with intelligent detection"""
         self.logger.info(f"Analyzing target: {url}")
         
+        # Ensure URL has a scheme
+        if not url.startswith(('http://', 'https://')):
+            url = f"http://{url}"
+            
         parsed_url = urlparse(url)
         target_info = TargetInfo(
             url=url,
-            domain=parsed_url.netloc
+            domain=parsed_url.netloc if parsed_url.netloc else url.replace('http://', '').replace('https://', '').split('/')[0]
         )
         
         # Basic HTTP analysis
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=10, ssl=False) as response:
+            # Create session with custom settings for better compatibility
+            timeout = aiohttp.ClientTimeout(total=10, connect=5)
+            connector = aiohttp.TCPConnector(ssl=False, force_close=True)
+            
+            async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
+                # Add headers to avoid being blocked
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (compatible; Dirsearch-MCP/1.0)',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                }
+                
+                async with session.get(url, headers=headers, allow_redirects=True) as response:
                     headers = dict(response.headers)
                     
                     # Server detection
@@ -326,8 +340,15 @@ class MCPCoordinator:
                     # CMS detection
                     target_info.detected_cms = self._detect_cms(content, headers)
                     
+        except aiohttp.ClientError as e:
+            self.logger.warning(f"HTTP error analyzing target {url}: {e}")
+            # Continue with limited analysis
+        except asyncio.TimeoutError:
+            self.logger.warning(f"Timeout analyzing target {url}")
+            # Continue with limited analysis
         except Exception as e:
-            self.logger.error(f"Target analysis error: {e}")
+            self.logger.error(f"Unexpected error analyzing target {url}: {type(e).__name__}: {e}")
+            # Continue with limited analysis
         
         # AI-enhanced analysis
         if self.intelligence_mode == 'AI_AGENT':

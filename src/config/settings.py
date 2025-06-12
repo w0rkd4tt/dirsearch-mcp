@@ -21,7 +21,9 @@ class Settings:
             'retry_attempts': 3,
             'exclude_status': '404',
             'include_status': None,
-            'batch_size': 50
+            'batch_size': 50,
+            'recursive': True,  # Enable recursive scanning by default
+            'recursion_depth': 3  # Default recursion depth
         }
         
         # AI configuration
