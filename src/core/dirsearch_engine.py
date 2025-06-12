@@ -67,6 +67,8 @@ class ScanRequest:
     include_status: Optional[str] = None
     recursive: bool = True  # Default to True for recursive scanning
     recursion_depth: int = 3  # Default depth of 3 levels
+    wordlist_type: str = "enhanced"  # Type of wordlist to use
+    additional_wordlists: List[str] = field(default_factory=list)  # Additional wordlists to combine
 
 
 @dataclass
@@ -142,7 +144,14 @@ class DirsearchEngine:
             'timeout': 10,
             'user_agent': 'Mozilla/5.0 (compatible; Dirsearch-MCP/1.0)',
             'follow_redirects': True,
-            'exclude_status': '404'
+            'exclude_status': '404',
+            'default_wordlist': 'wordlists/combined-enhanced.txt',
+            'wordlists': {
+                'common': 'wordlists/common.txt',
+                'api': 'wordlists/api-endpoints.txt',
+                'hidden': 'wordlists/hidden-files.txt',
+                'enhanced': 'wordlists/combined-enhanced.txt'
+            }
         }
         
     async def __aenter__(self):
@@ -201,9 +210,23 @@ class DirsearchEngine:
         self._stop_event.clear()
         
         # Prepare URL
-        url = url.rstrip('/')
         if not url.startswith(('http://', 'https://')):
             url = 'http://' + url
+            
+        # Parse URL to check if it has a path that should be treated as a directory
+        parsed = urlparse(url)
+        if parsed.path and parsed.path != '/':
+            # If path doesn't end with / and doesn't look like a file, add /
+            if not parsed.path.endswith('/'):
+                last_segment = parsed.path.split('/')[-1]
+                # If no extension, likely a directory
+                if '.' not in last_segment:
+                    url = url + '/'
+                    if self.logger:
+                        self.logger.debug(f"Added trailing slash to directory URL: {url}")
+        else:
+            # For root URLs, ensure no trailing slash for consistency
+            url = url.rstrip('/')
             
         # Generate paths to scan
         paths = self._generate_paths(wordlist, options)
@@ -647,8 +670,8 @@ class DirsearchEngine:
         
         start_time = datetime.now()
         
-        # Load wordlist
-        wordlist_paths = self._load_wordlist(scan_request.wordlist)
+        # Load wordlists (supports multiple wordlists)
+        wordlist_paths = self._load_wordlists(scan_request)
         
         # Create scan options from request
         options = ScanOptions(
@@ -729,3 +752,33 @@ class DirsearchEngine:
         else:
             # Treat as comma-separated list
             return [w.strip() for w in wordlist_path.split(',') if w.strip()]
+    
+    def _load_wordlists(self, scan_request: ScanRequest) -> List[str]:
+        """Load and combine multiple wordlists based on scan request"""
+        all_words = set()
+        
+        # Determine which wordlist to use based on wordlist_type
+        primary_wordlist = None
+        if scan_request.wordlist_type in self.config.get('wordlists', {}):
+            primary_wordlist = self.config['wordlists'][scan_request.wordlist_type]
+        elif scan_request.wordlist:
+            primary_wordlist = scan_request.wordlist
+        else:
+            primary_wordlist = self.config.get('default_wordlist', 'wordlists/combined-enhanced.txt')
+        
+        # Load primary wordlist
+        if primary_wordlist:
+            words = self._load_wordlist(primary_wordlist)
+            all_words.update(words)
+            if self.logger:
+                self.logger.info(f"Loaded {len(words)} words from primary wordlist: {primary_wordlist}")
+        
+        # Load additional wordlists
+        for wordlist in scan_request.additional_wordlists:
+            words = self._load_wordlist(wordlist)
+            all_words.update(words)
+            if self.logger:
+                self.logger.info(f"Loaded {len(words)} words from additional wordlist: {wordlist}")
+        
+        # Convert to sorted list for consistent ordering
+        return sorted(list(all_words))

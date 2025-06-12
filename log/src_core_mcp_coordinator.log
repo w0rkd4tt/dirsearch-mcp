@@ -76,3 +76,7 @@
 2025-06-12 11:07:16,004 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
 2025-06-12 11:07:47,812 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://192.168.214.143
 2025-06-12 11:07:52,819 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143: Connection timeout to host http://192.168.214.143
+2025-06-12 11:24:25,319 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 11:24:25,319 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: 192.168.214.143/api
+2025-06-12 11:24:30,321 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143/api: Connection timeout to host http://192.168.214.143/api
+2025-06-12 11:24:30,322 - src.core.mcp_coordinator - [32mINFO[0m - generate_scan_plan:457 - Generating scan plan

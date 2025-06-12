@@ -398,7 +398,10 @@ class InteractiveMenu:
     def _get_available_wordlists(self) -> List[Tuple[str, str]]:
         """Get available wordlists with descriptions"""
         wordlists = [
-            ("common.txt", "Common paths and files (~1000 entries)"),
+            ("combined-enhanced.txt", "Enhanced combined wordlist (recommended)"),
+            ("api-endpoints.txt", "API-specific endpoints and nested paths"),
+            ("hidden-files.txt", "Hidden files and sensitive data"),
+            ("common.txt", "Common paths and files (~4700 entries)"),
             ("directory-list-2.3-small.txt", "Small directory list (~87k entries)"),
             ("directory-list-2.3-medium.txt", "Medium directory list (~220k entries)"),
             ("php_common.txt", "PHP-specific paths"),
@@ -409,8 +412,7 @@ class InteractiveMenu:
             ("joomla.txt", "Joomla-specific paths"),
             ("admin_panels.txt", "Admin interfaces"),
             ("backup_files.txt", "Backup file patterns"),
-            ("sensitive_files.txt", "Sensitive file patterns"),
-            ("api_endpoints.txt", "Common API endpoints")
+            ("sensitive_files.txt", "Sensitive file patterns")
         ]
         
         # Filter existing files

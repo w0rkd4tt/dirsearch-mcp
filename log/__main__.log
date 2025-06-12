@@ -140,3 +140,25 @@ Generating all report...
 2025-06-12 10:55:44,938 - __main__ - [32mINFO[0m - run_direct_scan:488 -   MARKDOWN: report/markdown/scan_report_192.168.214.143_20250612_105544.md
 2025-06-12 10:55:44,938 - __main__ - [32mINFO[0m - run_direct_scan:496 - 
 All scans completed
+2025-06-12 11:24:25,318 - __main__ - [32mINFO[0m - run_direct_scan:355 - Starting Dirsearch MCP v1.0.0
+2025-06-12 11:24:25,319 - __main__ - [32mINFO[0m - run_direct_scan:368 - MCP Intelligence Mode: LOCAL
+2025-06-12 11:24:25,319 - __main__ - [32mINFO[0m - run_direct_scan:390 - 
+Scanning target: 192.168.214.143/api
+2025-06-12 11:24:25,319 - __main__ - [32mINFO[0m - run_direct_scan:394 - Analyzing target...
+2025-06-12 11:24:30,321 - __main__ - [32mINFO[0m - run_direct_scan:398 - Server: None
+2025-06-12 11:24:30,322 - __main__ - [32mINFO[0m - run_direct_scan:399 - Technologies: 
+2025-06-12 11:24:30,322 - __main__ - [32mINFO[0m - run_direct_scan:405 - Generating optimized scan plan...
+2025-06-12 11:24:30,322 - __main__ - [32mINFO[0m - run_direct_scan:425 - Starting scan with 10 threads...
+2025-06-12 11:24:30,669 - __main__ - [32mINFO[0m - run_direct_scan:457 - 
+Scan completed:
+2025-06-12 11:24:30,669 - __main__ - [32mINFO[0m - run_direct_scan:458 - Total requests: 23720
+2025-06-12 11:24:30,669 - __main__ - [32mINFO[0m - run_direct_scan:459 - Found paths: 0
+2025-06-12 11:24:30,670 - __main__ - [32mINFO[0m - run_direct_scan:460 - Errors: 0
+2025-06-12 11:24:30,670 - __main__ - [32mINFO[0m - run_direct_scan:470 - 
+Generating all report...
+2025-06-12 11:24:30,670 - __main__ - [32mINFO[0m - run_direct_scan:505 - Reports saved:
+2025-06-12 11:24:30,671 - __main__ - [32mINFO[0m - run_direct_scan:507 -   JSON: report/json/scan_report_192.168.214.143_20250612_112430.json
+2025-06-12 11:24:30,671 - __main__ - [32mINFO[0m - run_direct_scan:507 -   HTML: report/html/scan_report_192.168.214.143_20250612_112430.html
+2025-06-12 11:24:30,671 - __main__ - [32mINFO[0m - run_direct_scan:507 -   MARKDOWN: report/markdown/scan_report_192.168.214.143_20250612_112430.md
+2025-06-12 11:24:30,671 - __main__ - [32mINFO[0m - run_direct_scan:515 - 
+All scans completed

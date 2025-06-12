@@ -477,13 +477,17 @@ Response Patterns: {json.dumps(target_info.response_patterns, indent=2)}"""
         """Generate scan plan using local rules"""
         tasks = []
         
-        # Base scan task
+        # Base scan task with enhanced wordlist selection
+        primary_wordlist, additional_wordlists = self._select_wordlist(target_info)
         base_params = {
-            'wordlist': self._select_wordlist(target_info),
+            'wordlist_type': primary_wordlist,
+            'additional_wordlists': additional_wordlists,
             'extensions': self._select_extensions(target_info),
             'threads': self._calculate_threads(target_info),
             'timeout': 10,
-            'delay': 0
+            'delay': 0,
+            'recursive': True,
+            'recursion_depth': 3
         }
         
         tasks.append(ScanTask(
@@ -521,8 +525,21 @@ Response Patterns: {json.dumps(target_info.response_patterns, indent=2)}"""
         
         return tasks
     
-    def _select_wordlist(self, target_info: TargetInfo) -> str:
-        """Select appropriate wordlist based on target"""
+    def _select_wordlist(self, target_info: TargetInfo) -> Tuple[str, List[str]]:
+        """Select appropriate wordlist based on target
+        
+        Returns:
+            Tuple of (primary_wordlist_type, additional_wordlists)
+        """
+        additional_wordlists = []
+        primary_type = 'enhanced'  # Default to enhanced wordlist
+        
+        # Check if URL contains API patterns
+        url_lower = target_info.url.lower()
+        if any(pattern in url_lower for pattern in ['/api', '/v1', '/v2', '/rest', '/graphql']):
+            primary_type = 'api'
+            additional_wordlists.append('wordlists/hidden-files.txt')
+            
         # CMS-specific wordlists
         if target_info.detected_cms:
             cms_wordlists = {
@@ -531,19 +548,22 @@ Response Patterns: {json.dumps(target_info.response_patterns, indent=2)}"""
                 'Drupal': 'drupal.txt'
             }
             if target_info.detected_cms in cms_wordlists:
-                return cms_wordlists[target_info.detected_cms]
+                additional_wordlists.append(f'wordlists/{cms_wordlists[target_info.detected_cms]}')
         
         # Technology-specific
         tech_stack = ' '.join(target_info.technology_stack).lower()
         if 'php' in tech_stack:
-            return 'php_common.txt'
+            additional_wordlists.append('wordlists/php_common.txt')
         elif 'asp' in tech_stack or '.net' in tech_stack:
-            return 'aspnet_common.txt'
+            additional_wordlists.append('wordlists/aspnet_common.txt')
         elif 'java' in tech_stack:
-            return 'java_common.txt'
+            additional_wordlists.append('wordlists/java_common.txt')
         
-        # Default
-        return 'common.txt'
+        # Always include hidden files for comprehensive scanning
+        if 'wordlists/hidden-files.txt' not in additional_wordlists:
+            additional_wordlists.append('wordlists/hidden-files.txt')
+        
+        return primary_type, additional_wordlists
     
     def _select_extensions(self, target_info: TargetInfo) -> List[str]:
         """Select file extensions based on technology"""
