@@ -1,0 +1,117 @@
+# DVWA (Damn Vulnerable Web Application) specific wordlist
+# Common DVWA directories and files
+
+# Root level
+index.php
+login.php
+logout.php
+setup.php
+phpinfo.php
+security.php
+instructions.php
+about.php
+
+# Vulnerabilities directory
+vulnerabilities
+vulnerabilities/brute
+vulnerabilities/exec
+vulnerabilities/fi
+vulnerabilities/sqli
+vulnerabilities/sqli_blind
+vulnerabilities/upload
+vulnerabilities/xss_r
+vulnerabilities/xss_s
+vulnerabilities/csrf
+vulnerabilities/captcha
+vulnerabilities/weak_id
+vulnerabilities/open_redirect
+vulnerabilities/csp
+vulnerabilities/javascript
+vulnerabilities/authbypass
+
+# Vulnerability files
+vulnerabilities/brute/index.php
+vulnerabilities/brute/source/low.php
+vulnerabilities/brute/source/medium.php
+vulnerabilities/brute/source/high.php
+vulnerabilities/brute/source/impossible.php
+vulnerabilities/exec/index.php
+vulnerabilities/exec/source/low.php
+vulnerabilities/exec/source/medium.php
+vulnerabilities/exec/source/high.php
+vulnerabilities/exec/source/impossible.php
+vulnerabilities/fi/index.php
+vulnerabilities/sqli/index.php
+vulnerabilities/sqli_blind/index.php
+vulnerabilities/upload/index.php
+vulnerabilities/xss_r/index.php
+vulnerabilities/xss_s/index.php
+vulnerabilities/csrf/index.php
+
+# Common directories
+config
+database
+docs
+dvwa
+external
+hackable
+includes
+js
+css
+
+# Include files
+dvwa/includes/dvwaPage.inc.php
+dvwa/includes/DBMS/MySQL.php
+dvwa/includes/DBMS/PGSQL.php
+
+# Config files
+config/config.inc.php
+config/config.inc.php.dist
+
+# External resources
+external/phpids
+external/phpids/0.6/lib/IDS
+
+# Hackable directory
+hackable/uploads
+hackable/flags
+
+# Database
+database/dvwa.sql
+
+# Documentation
+docs/DVWA_v1.0.7.pdf
+docs/pdf.php
+
+# Specific PHP files
+dvwa.php
+ids_log.php
+
+# Common backup/test files
+.htaccess
+.htpasswd
+robots.txt
+test.php
+info.php
+phpinfo.php
+backup
+backup.sql
+database.sql
+dvwa.sql
+dump.sql
+.git
+.gitignore
+.env
+
+# Additional test paths
+admin
+administrator
+api
+uploads
+tmp
+temp
+files
+data
+logs
+cache
+sessions
