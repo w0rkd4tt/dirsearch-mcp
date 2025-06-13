@@ -1,0 +1,159 @@
+# Critical admin endpoints - High priority scanning
+# Administrative interfaces
+admin
+administrator
+administration
+admin/login
+admin/dashboard
+admin/panel
+admin/config
+admin/users
+admin/settings
+admin/backup
+admin/db
+admin/database
+admin/logs
+admin/audit
+admin/reports
+admin/analytics
+admin/stats
+admin/system
+admin/console
+admin/portal
+admin/index
+admin/home
+admin/main
+
+# User management
+admin/users/list
+admin/users/add
+admin/users/edit
+admin/users/delete
+admin/users/export
+admin/users/import
+admin/users/roles
+admin/users/permissions
+
+# Settings and configuration
+admin/settings/general
+admin/settings/security
+admin/settings/backup
+admin/settings/email
+admin/settings/api
+admin/settings/database
+admin/config/general
+admin/config/system
+admin/config/advanced
+
+# Database management
+phpmyadmin
+pma
+adminer
+adminer.php
+sqlmanager
+mysqlmanager
+pgadmin
+mongodb-admin
+redis-admin
+
+# Control panels
+cpanel
+whm
+plesk
+directadmin
+webmin
+ispconfig
+cloudpanel
+cyberpanel
+cwp
+vestacp
+hestiacp
+
+# CMS admin paths
+wp-admin
+wp-login.php
+administrator
+admin.php
+user/login
+admin/config
+backend
+adminhtml
+
+# Framework admin
+django-admin
+rails/admin
+laravel/admin
+symfony/_admin
+yii/admin
+codeigniter/admin
+
+# Hidden admin variations
+_admin
+.admin
+~admin
+admin_
+admin.bak
+admin.old
+admin-old
+admin_old
+admin.backup
+admin~
+admin123
+admin2
+admin2020
+admin2021
+admin2022
+admin2023
+admin2024
+admin2025
+
+# Common admin files
+admin/index.php
+admin/index.html
+admin/login.php
+admin/login.html
+admin/dashboard.php
+admin/panel.php
+admin/control.php
+admin/manager.php
+
+# Authentication related
+admin/auth
+admin/authenticate
+admin/signin
+admin/sso
+admin/oauth
+admin/saml
+admin/ldap
+
+# Monitoring and logs
+admin/monitor
+admin/monitoring
+admin/logs
+admin/log
+admin/error_log
+admin/access_log
+admin/debug
+admin/trace
+
+# Backup and export
+admin/backup
+admin/export
+admin/dump
+admin/download
+admin/restore
+
+# API admin
+admin/api
+admin/api/docs
+admin/swagger
+admin/graphql
+admin/rest
+
+# System administration
+admin/phpinfo
+admin/server-status
+admin/server-info
+admin/env
+admin/environment
+admin/variables

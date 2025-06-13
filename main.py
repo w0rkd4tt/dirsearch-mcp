@@ -43,6 +43,8 @@ class DirsearchMCPCLI:
         self.settings = None
         self.logger = None
         self.interrupted = False
+        self.current_engine = None
+        self.current_tasks = []
         
     def setup_signal_handlers(self):
         """Setup signal handlers for graceful shutdown"""
@@ -52,8 +54,18 @@ class DirsearchMCPCLI:
                 self.logger.warning("\nReceived interrupt signal. Shutting down gracefully...")
             else:
                 print("\nReceived interrupt signal. Shutting down gracefully...")
-            # Set a flag to exit gracefully
-            # Don't create tasks in signal handler as it may not have event loop context
+            
+            # Stop any running scan engine
+            if self.current_engine:
+                self.current_engine.stop_scan()
+            
+            # Cancel all running tasks
+            for task in self.current_tasks:
+                if not task.done():
+                    task.cancel()
+            
+            # For immediate exit on macOS, raise KeyboardInterrupt
+            raise KeyboardInterrupt()
         
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
@@ -62,10 +74,16 @@ class DirsearchMCPCLI:
         """Graceful shutdown procedure"""
         # Cancel all running tasks
         try:
+            # Python 3.7+
             tasks = [t for t in asyncio.all_tasks() if t != asyncio.current_task()]
         except AttributeError:
-            # Python 3.9+ uses asyncio.all_tasks()
-            tasks = [t for t in asyncio.Task.all_tasks() if t != asyncio.Task.current_task()]
+            try:
+                # Python 3.9+ (asyncio.all_tasks might be deprecated)
+                tasks = [t for t in asyncio.Task.all_tasks() if t != asyncio.Task.current_task()]
+            except AttributeError:
+                # Fallback for newer Python versions
+                loop = asyncio.get_event_loop()
+                tasks = [t for t in asyncio.all_tasks(loop) if t != asyncio.current_task()]
         
         for task in tasks:
             task.cancel()
@@ -291,6 +309,16 @@ Examples:
             action='store_true',
             help='Quick scan with MCP auto-configuration'
         )
+        mode_group.add_argument(
+            '--smart',
+            action='store_true',
+            help='Smart scan with intelligent discovery (Recommended)'
+        )
+        mode_group.add_argument(
+            '--monster',
+            action='store_true',
+            help='Monster mode with maximum discovery (WARNING: Extremely aggressive)'
+        )
         
         return parser
     
@@ -401,7 +429,51 @@ Examples:
                     self.logger.info(f"CMS: {target_info.detected_cms}")
                 
                 # Step 2: Generate scan plan
-                if args.quick:
+                if args.smart:
+                    # Smart mode configuration
+                    self.logger.info("🧠 SMART MODE: Using intelligent discovery with rule-based optimization")
+                    params = {
+                        'threads': 20,
+                        'timeout': 15,
+                        'delay': 0,
+                        'user_agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+                        'follow_redirects': True
+                    }
+                    wordlist = 'critical-admin.txt'
+                    # TODO: Add support for multiple wordlists in CLI mode
+                    extensions = ['php', 'asp', 'aspx', 'jsp', 'html', 'json', 'xml', 'sql', 'zip', 'bak']
+                    args.recursive = True
+                    args.recursion_depth = 3
+                    args.include_status = '200,201,301,302,401,403,500'
+                    
+                elif args.monster:
+                    # Monster mode configuration
+                    self.logger.warning("👹 MONSTER MODE: Using EXTREMELY aggressive settings for maximum discovery")
+                    if not args.quiet:
+                        print("\n⚠️  WARNING: Monster mode generates MASSIVE traffic!")
+                        print("👹 Only unleash the monster with explicit permission!\n")
+                    
+                    params = {
+                        'threads': 50,  # Maximum threads
+                        'timeout': 30,  # Extended timeout
+                        'delay': 0,     # No delay
+                        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                        'follow_redirects': True
+                    }
+                    wordlist = 'monster-all.txt'  # Just the filename, not the path
+                    extensions = [
+                        'php', 'html', 'htm', 'asp', 'aspx', 'jsp', 'jspx', 'do', 'action',
+                        'pl', 'cgi', 'py', 'rb', 'js', 'css', 'xml', 'json', 'yaml', 'yml',
+                        'txt', 'log', 'md', 'conf', 'config', 'ini', 'env', 'properties',
+                        'bak', 'backup', 'old', 'orig', 'save', 'swp', 'tmp', 'temp',
+                        'zip', 'tar', 'gz', 'rar', '7z', 'sql', 'db', 'sqlite'
+                    ]
+                    args.recursive = True
+                    args.recursion_depth = 5
+                    args.exclude_status = ''  # Don't exclude any status
+                    args.max_retries = 5
+                    
+                elif args.quick:
                     self.logger.info("Generating optimized scan plan...")
                     scan_plan = await mcp.generate_scan_plan(target_info)
                     
@@ -451,7 +523,11 @@ Examples:
                 )
                 
                 # Execute scan
-                scan_response = await engine.execute_scan(scan_request)
+                self.current_engine = engine
+                try:
+                    scan_response = await engine.execute_scan(scan_request)
+                finally:
+                    self.current_engine = None
                 
                 # Log results
                 self.logger.info(f"\nScan completed:")
@@ -459,11 +535,44 @@ Examples:
                 self.logger.info(f"Found paths: {scan_response.statistics['found_paths']}")
                 self.logger.info(f"Errors: {scan_response.statistics.get('errors', 0)}")
                 
-                # Display results
+                # Display results (limited to 20 lines)
                 if scan_response.results and not args.quiet:
                     self.logger.info("\nDiscovered paths:")
-                    for result in sorted(scan_response.results, key=lambda x: (x['status'], x['path'])):
-                        self.logger.info(f"  [{result['status']}] {result['path']} - {result['size']} bytes")
+                    sorted_results = sorted(scan_response.results, key=lambda x: (x['status'], x['path']))
+                    
+                    # Group by status code for better display
+                    status_groups = {}
+                    for result in sorted_results:
+                        status = result['status']
+                        if status not in status_groups:
+                            status_groups[status] = []
+                        status_groups[status].append(result)
+                    
+                    # Display up to 20 lines total
+                    lines_shown = 0
+                    max_lines = 20
+                    
+                    for status in sorted(status_groups.keys()):
+                        if lines_shown >= max_lines:
+                            break
+                        
+                        items = status_groups[status]
+                        self.logger.info(f"\n  [{status}] Status Code - {len(items)} found:")
+                        lines_shown += 1
+                        
+                        # Show up to remaining lines for this status
+                        items_to_show = min(len(items), max_lines - lines_shown)
+                        for i, result in enumerate(items[:items_to_show]):
+                            self.logger.info(f"    • {result['path']} - {result['size']} bytes")
+                            lines_shown += 1
+                        
+                        if len(items) > items_to_show:
+                            self.logger.info(f"    ... and {len(items) - items_to_show} more")
+                            lines_shown += 1
+                    
+                    # Show summary if results were truncated
+                    if len(sorted_results) > max_lines:
+                        self.logger.info(f"\n  (Showing {min(lines_shown, max_lines)} of {len(sorted_results)} total results)")
                 
                 # Step 4: Generate report
                 if args.report_format:
@@ -523,10 +632,7 @@ Examples:
     
     async def main(self):
         """Main application entry point"""
-        # Setup signal handlers
-        self.setup_signal_handlers()
-        
-        # Parse command-line arguments
+        # Parse command-line arguments first (before signal handlers)
         parser = self.create_parser()
         args = parser.parse_args()
         
@@ -535,16 +641,28 @@ Examples:
             os.environ['NO_COLOR'] = '1'
         
         try:
+            # Setup signal handlers after parsing args
+            self.setup_signal_handlers()
+            
             # Determine mode
             if args.url or args.url_list:
                 # Direct scan mode
-                await self.run_direct_scan(args)
+                task = asyncio.create_task(self.run_direct_scan(args))
+                self.current_tasks.append(task)
+                await task
             else:
                 # Interactive mode
-                await self.run_interactive_mode(args)
+                task = asyncio.create_task(self.run_interactive_mode(args))
+                self.current_tasks.append(task)
+                await task
                 
         except KeyboardInterrupt:
             print("\nOperation cancelled by user")
+            await self.shutdown()
+            sys.exit(0)
+        except asyncio.CancelledError:
+            print("\nOperation cancelled")
+            await self.shutdown()
             sys.exit(0)
         except Exception as e:
             print(f"\nError: {e}")
@@ -568,12 +686,19 @@ def main():
     except RuntimeError as e:
         if "This event loop is already running" in str(e):
             # Handle Jupyter notebook environment
-            import nest_asyncio
-            nest_asyncio.apply()
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(cli.main())
+            try:
+                import nest_asyncio
+                nest_asyncio.apply()
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(cli.main())
+            except ImportError:
+                print("Note: For Jupyter notebook support, install nest-asyncio: pip install nest-asyncio")
+                raise
         else:
             raise
+    except KeyboardInterrupt:
+        print("\nOperation cancelled by user")
+        sys.exit(0)
 
 
 if __name__ == "__main__":

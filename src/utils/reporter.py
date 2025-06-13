@@ -7,10 +7,14 @@ import html
 from dataclasses import asdict
 import base64
 import io
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
-import matplotlib.pyplot as plt
-import seaborn as sns
+try:
+    import matplotlib
+    matplotlib.use('Agg')  # Use non-interactive backend
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
 
 
 class ReportGenerator:
@@ -52,28 +56,43 @@ class ReportGenerator:
         # Convert any dataclasses to dicts
         clean_data = self._clean_data_for_json(scan_data)
         
-        # Structure the report
+        # Extract scan configuration
+        scan_config = clean_data.get('scan_config', {})
+        
+        # Structure the report focusing on target, config, and directory tree
         report = {
-            'metadata': {
-                'report_version': '1.0',
-                'generated_at': datetime.now().isoformat(),
-                'generator': 'DirsearchMCP'
+            'target': {
+                'url': clean_data.get('target_url', ''),
+                'domain': clean_data.get('target_domain', ''),
+                'server_type': clean_data.get('target_analysis', {}).get('server_type', 'Unknown'),
+                'technology_stack': clean_data.get('target_analysis', {}).get('technology_stack', [])
             },
-            'scan_info': {
-                'target_url': clean_data.get('target_url', ''),
-                'target_domain': clean_data.get('target_domain', ''),
+            'scan_configuration': {
+                'wordlist': scan_config.get('wordlist', 'unknown'),
+                'threads': scan_config.get('threads', 10),
+                'timeout': scan_config.get('timeout', 10),
+                'extensions': scan_config.get('extensions', []),
+                'follow_redirects': scan_config.get('follow_redirects', False),
+                'recursive': scan_config.get('recursive', False),
+                'recursion_depth': scan_config.get('recursion_depth', 0),
+                'detect_wildcards': scan_config.get('detect_wildcards', True),
+                'intelligence_mode': clean_data.get('intelligence_mode', 'LOCAL'),
+                'user_agent': scan_config.get('user_agent', 'Default')
+            },
+            'scan_summary': {
                 'start_time': clean_data.get('start_time', ''),
                 'end_time': clean_data.get('end_time', ''),
                 'duration': clean_data.get('duration', 0),
-                'intelligence_mode': clean_data.get('intelligence_mode', 'LOCAL')
+                'total_requests': clean_data.get('performance_metrics', {}).get('total_requests', 0),
+                'findings_count': len(clean_data.get('scan_results', []))
             },
-            'target_analysis': clean_data.get('target_analysis', {}),
-            'mcp_decisions': clean_data.get('mcp_decisions', []),
-            'scan_plan': clean_data.get('scan_plan', []),
-            'scan_results': clean_data.get('scan_results', []),
-            'findings_summary': self._generate_findings_summary(clean_data),
-            'performance_metrics': clean_data.get('performance_metrics', {}),
-            'recommendations': self._generate_recommendations(clean_data)
+            'directory_tree': self._generate_directory_tree(clean_data),
+            'detailed_results': clean_data.get('scan_results', []),
+            'metadata': {
+                'report_version': '2.0',
+                'generated_at': datetime.now().isoformat(),
+                'generator': 'DirsearchMCP'
+            }
         }
         
         with open(file_path, 'w', encoding='utf-8') as f:
@@ -106,20 +125,19 @@ class ReportGenerator:
 <body>
     <div class="container">
         <header>
-            <h1>Dirsearch MCP Scan Report</h1>
-            <div class="metadata">
-                <span>Target: <strong>{html.escape(scan_data.get('target_url', ''))}</strong></span>
-                <span>Generated: <strong>{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</strong></span>
-                <span>Mode: <strong>{scan_data.get('intelligence_mode', 'LOCAL')}</strong></span>
+            <h1>Directory Scan Report</h1>
+            <div class="target-info">
+                <h2>{html.escape(scan_data.get('target_url', ''))}</h2>
+                <div class="metadata">
+                    <span>Domain: <strong>{html.escape(scan_data.get('target_domain', ''))}</strong></span>
+                    <span>Date: <strong>{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</strong></span>
+                </div>
             </div>
         </header>
         
-        {self._generate_executive_summary_html(scan_data)}
-        {self._generate_target_analysis_html(scan_data)}
-        {self._generate_mcp_decisions_html(scan_data)}
-        {self._generate_findings_html(scan_data, charts)}
-        {self._generate_performance_html(scan_data, charts)}
-        {self._generate_recommendations_html(scan_data)}
+        {self._generate_scan_config_html(scan_data)}
+        {self._generate_directory_tree_html(scan_data)}
+        {self._generate_scan_summary_html(scan_data)}
         
         <footer>
             <p>Generated by Dirsearch MCP - Intelligent Directory Scanner with AI Integration</p>
@@ -141,41 +159,45 @@ class ReportGenerator:
         """Generate Markdown format report"""
         file_path = self.report_dir / 'markdown' / f"{base_name}.md"
         
-        md_content = f"""# Dirsearch MCP Scan Report
+        scan_config = scan_data.get('scan_config', {})
+        
+        md_content = f"""# Directory Scan Report
 
-**Target:** {scan_data.get('target_url', 'Unknown')}  
-**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  
-**Intelligence Mode:** {scan_data.get('intelligence_mode', 'LOCAL')}
+## Target: {scan_data.get('target_url', 'Unknown')}
 
----
-
-## Executive Summary
-
-{self._generate_executive_summary_md(scan_data)}
-
-## Target Analysis
-
-{self._generate_target_analysis_md(scan_data)}
-
-## MCP Coordination Decisions
-
-{self._generate_mcp_decisions_md(scan_data)}
-
-## Scan Results
-
-{self._generate_findings_md(scan_data)}
-
-## Performance Metrics
-
-{self._generate_performance_md(scan_data)}
-
-## Recommendations
-
-{self._generate_recommendations_md(scan_data)}
+**Domain:** {scan_data.get('target_domain', 'Unknown')}  
+**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 ---
 
-*Generated by Dirsearch MCP - Intelligent Directory Scanner with AI Integration*
+## Scan Configuration
+
+| Setting | Value |
+|---------|-------|
+| Wordlist | {scan_config.get('wordlist', 'default')} |
+| Threads | {scan_config.get('threads', 10)} |
+| Extensions | {', '.join(scan_config.get('extensions', [])) or 'None'} |
+| Recursive | {'Yes' if scan_config.get('recursive', False) else 'No'} |
+| Follow Redirects | {'Yes' if scan_config.get('follow_redirects', False) else 'No'} |
+| Wildcard Detection | {'Enabled' if scan_config.get('detect_wildcards', True) else 'Disabled'} |
+| User Agent | {scan_config.get('user_agent', 'Default')[:50]} |
+| Intelligence Mode | {scan_data.get('intelligence_mode', 'LOCAL')} |
+
+---
+
+## Directory Tree
+
+{self._generate_directory_tree_md(scan_data)}
+
+---
+
+## Scan Summary
+
+{self._generate_scan_summary_md(scan_data)}
+
+---
+
+*Generated by Dirsearch MCP - Intelligent Directory Scanner*
 """
         
         with open(file_path, 'w', encoding='utf-8') as f:
@@ -198,24 +220,33 @@ class ReportGenerator:
     
     def _generate_findings_summary(self, scan_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate findings summary statistics"""
-        results = scan_data.get('scan_results', [])
-        all_findings = []
-        
-        for result in results:
-            all_findings.extend(result.get('findings', []))
+        # scan_results is directly the array of findings
+        all_findings = scan_data.get('scan_results', [])
         
         # Group by status code
         status_groups = {}
+        directories = []
+        files = []
+        
         for finding in all_findings:
             status = finding.get('status', 0)
             if status not in status_groups:
                 status_groups[status] = []
             status_groups[status].append(finding)
+            
+            # Track directories vs files
+            if finding.get('is_directory', False):
+                directories.append(finding)
+            else:
+                files.append(finding)
         
         return {
             'total_findings': len(all_findings),
             'by_status': {str(k): len(v) for k, v in status_groups.items()},
             'interesting_paths': [f for f in all_findings if f.get('status') in [200, 301, 302, 401, 403]],
+            'directories_found': len(directories),
+            'files_found': len(files),
+            'directory_list': [d.get('path', '') for d in directories],
             'potential_vulnerabilities': self._identify_vulnerabilities(all_findings)
         }
     
@@ -260,6 +291,15 @@ class ReportGenerator:
         """Generate recommendations based on findings"""
         recommendations = []
         findings_summary = self._generate_findings_summary(scan_data)
+        
+        # Based on directories found
+        if findings_summary.get('directories_found', 0) > 0:
+            recommendations.append({
+                'category': 'Directory Enumeration',
+                'recommendation': 'Directories Discovered',
+                'details': f"Found {findings_summary['directories_found']} directories. Consider recursive scanning of discovered directories.",
+                'priority': 'High'
+            })
         
         # Based on vulnerabilities
         vulns = findings_summary.get('potential_vulnerabilities', [])
@@ -306,47 +346,54 @@ class ReportGenerator:
         """Generate charts for HTML report"""
         charts = {}
         
-        # Status code distribution chart
-        findings_summary = self._generate_findings_summary(scan_data)
-        status_dist = findings_summary.get('by_status', {})
+        if not MATPLOTLIB_AVAILABLE:
+            return charts
         
-        if status_dist:
-            fig, ax = plt.subplots(figsize=(8, 6))
-            statuses = list(status_dist.keys())
-            counts = list(status_dist.values())
+        try:
+            # Status code distribution chart
+            findings_summary = self._generate_findings_summary(scan_data)
+            status_dist = findings_summary.get('by_status', {})
             
-            colors = ['#28a745' if s == '200' else '#dc3545' if s.startswith('4') else '#ffc107' for s in statuses]
-            ax.bar(statuses, counts, color=colors)
-            ax.set_xlabel('Status Code')
-            ax.set_ylabel('Count')
-            ax.set_title('HTTP Status Code Distribution')
+            if status_dist:
+                fig, ax = plt.subplots(figsize=(8, 6))
+                statuses = list(status_dist.keys())
+                counts = list(status_dist.values())
+                
+                colors = ['#28a745' if s == '200' else '#dc3545' if s.startswith('4') else '#ffc107' for s in statuses]
+                ax.bar(statuses, counts, color=colors)
+                ax.set_xlabel('Status Code')
+                ax.set_ylabel('Count')
+                ax.set_title('HTTP Status Code Distribution')
+                
+                # Convert to base64
+                buffer = io.BytesIO()
+                plt.savefig(buffer, format='png', bbox_inches='tight')
+                buffer.seek(0)
+                charts['status_distribution'] = base64.b64encode(buffer.read()).decode()
+                plt.close()
             
-            # Convert to base64
-            buffer = io.BytesIO()
-            plt.savefig(buffer, format='png', bbox_inches='tight')
-            buffer.seek(0)
-            charts['status_distribution'] = base64.b64encode(buffer.read()).decode()
-            plt.close()
-        
-        # Timeline chart if available
-        perf_metrics = scan_data.get('performance_metrics', {})
-        if 'timeline' in perf_metrics:
-            fig, ax = plt.subplots(figsize=(10, 6))
-            timeline = perf_metrics['timeline']
-            times = [t['time'] for t in timeline]
-            rates = [t['rate'] for t in timeline]
-            
-            ax.plot(times, rates, 'b-', linewidth=2)
-            ax.set_xlabel('Time (seconds)')
-            ax.set_ylabel('Requests/second')
-            ax.set_title('Scan Performance Over Time')
-            ax.grid(True, alpha=0.3)
-            
-            buffer = io.BytesIO()
-            plt.savefig(buffer, format='png', bbox_inches='tight')
-            buffer.seek(0)
-            charts['performance_timeline'] = base64.b64encode(buffer.read()).decode()
-            plt.close()
+            # Timeline chart if available
+            perf_metrics = scan_data.get('performance_metrics', {})
+            if 'timeline' in perf_metrics:
+                fig, ax = plt.subplots(figsize=(10, 6))
+                timeline = perf_metrics['timeline']
+                times = [t['time'] for t in timeline]
+                rates = [t['rate'] for t in timeline]
+                
+                ax.plot(times, rates, 'b-', linewidth=2)
+                ax.set_xlabel('Time (seconds)')
+                ax.set_ylabel('Requests/second')
+                ax.set_title('Scan Performance Over Time')
+                ax.grid(True, alpha=0.3)
+                
+                buffer = io.BytesIO()
+                plt.savefig(buffer, format='png', bbox_inches='tight')
+                buffer.seek(0)
+                charts['performance_timeline'] = base64.b64encode(buffer.read()).decode()
+                plt.close()
+        except Exception as e:
+            # If chart generation fails, continue without charts
+            pass
         
         return charts
     
@@ -382,6 +429,14 @@ class ReportGenerator:
         
         header h1 {
             margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+        
+        .target-info h2 {
+            color: #3498db;
+            margin: 1rem 0 0.5rem 0;
+            font-size: 1.8rem;
+            word-break: break-all;
         }
         
         .metadata {
@@ -389,6 +444,134 @@ class ReportGenerator:
             gap: 2rem;
             font-size: 0.9rem;
             opacity: 0.9;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .config-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .config-value {
+            color: #555;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .primary-section {
+            border: 2px solid #3498db;
+        }
+        
+        .primary-section h2 {
+            color: #3498db;
+            font-size: 1.8rem;
+        }
+        
+        .tree-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 1200px) {
+            .tree-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .tree-visualization pre {
+            margin: 0;
+            background-color: #2c3e50 !important;
+            color: #ecf0f1 !important;
+        }
+        
+        .tree-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .tree-stat {
+            text-align: center;
+            padding: 0.75rem;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .tree-stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .tree-stat-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+        
+        .legend-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .legend-item span {
+            font-size: 1.2rem;
         }
         
         .section {
@@ -702,12 +885,13 @@ class ReportGenerator:
         findings_rows = ""
         for finding in summary['interesting_paths'][:50]:  # Limit to 50 entries
             status_class = f"status-{finding.get('status', 0)}"
+            type_indicator = "📁" if finding.get('is_directory', False) else "📄"
             findings_rows += f"""
             <tr>
                 <td>{html.escape(finding.get('path', ''))}</td>
                 <td class="{status_class}">{finding.get('status', '')}</td>
                 <td>{finding.get('size', 0)}</td>
-                <td>{html.escape(finding.get('task_id', ''))}</td>
+                <td>{type_indicator} {'Directory' if finding.get('is_directory', False) else 'File'}</td>
             </tr>
             """
         
@@ -730,24 +914,48 @@ class ReportGenerator:
             {chart_html}
             
             <div class="tabs">
-                <button class="tab active" data-tab="findings-tab">Interesting Findings</button>
+                <button class="tab active" data-tab="all-results-tab">All Results</button>
+                <button class="tab" data-tab="findings-tab">Interesting Findings</button>
+                <button class="tab" data-tab="directories-tab">Directories</button>
                 <button class="tab" data-tab="vulnerabilities-tab">Potential Vulnerabilities</button>
             </div>
             
-            <div id="findings-tab" class="tab-content active">
+            <div id="all-results-tab" class="tab-content active">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Path</th>
+                            <th>Status</th>
+                            <th>Type</th>
+                            <th>Size</th>
+                            <th>Content Type</th>
+                            <th>Response Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {self._generate_all_results_rows(scan_data)}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="findings-tab" class="tab-content">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>Path</th>
                             <th>Status</th>
                             <th>Size</th>
-                            <th>Task</th>
+                            <th>Type</th>
                         </tr>
                     </thead>
                     <tbody>
                         {findings_rows}
                     </tbody>
                 </table>
+            </div>
+            
+            <div id="directories-tab" class="tab-content">
+                {self._generate_directories_html(summary)}
             </div>
             
             <div id="vulnerabilities-tab" class="tab-content">
@@ -814,9 +1022,9 @@ class ReportGenerator:
             priority_class = 'high' if rec['priority'] == 'High' else ''
             recs_html += f"""
             <div class="recommendation {priority_class}">
-                <strong>[{rec['priority']}] {html.escape(rec['category'])}:</strong> {html.escape(rec['recommendation'])}
+                <strong>[{rec.get('priority', 'Medium')}] {html.escape(str(rec.get('category', '')))}:</strong> {html.escape(str(rec.get('recommendation', '')))}
                 <br>
-                <small>{html.escape(rec['details'])}</small>
+                <small>{html.escape(str(rec.get('details', '')))}</small>
             </div>
             """
         
@@ -892,6 +1100,18 @@ class ReportGenerator:
         for finding in summary['interesting_paths'][:20]:
             findings_table += f"| {finding.get('path', '')} | {finding.get('status', '')} | {finding.get('size', 0)} |\n"
         
+        # Directories
+        dirs_content = "\n### Directories Found\n\n"
+        if summary.get('directories_found', 0) > 0:
+            dirs_content += f"**Total Directories:** {summary['directories_found']}\n\n"
+            dirs_content += "| Directory Path | Type |\n|----------------|------|\n"
+            for dir_path in summary.get('directory_list', [])[:20]:  # Limit to 20
+                dirs_content += f"| {dir_path} | 📁 Directory |\n"
+            if len(summary.get('directory_list', [])) > 20:
+                dirs_content += f"| ... and {len(summary.get('directory_list', [])) - 20} more | |\n"
+        else:
+            dirs_content += "No directories detected.\n"
+        
         # Vulnerabilities
         vulns_content = "\n### Potential Vulnerabilities\n\n"
         if summary['potential_vulnerabilities']:
@@ -905,7 +1125,15 @@ class ReportGenerator:
 
 {status_table}
 
+### Summary Statistics
+
+- **Total Findings:** {summary['total_findings']}
+- **Directories Found:** {summary.get('directories_found', 0)}
+- **Files Found:** {summary.get('files_found', 0)}
+
 {findings_table}
+
+{dirs_content}
 
 {vulns_content}
 """
@@ -942,3 +1170,439 @@ class ReportGenerator:
 """
         
         return md_content
+    
+    def _generate_all_results_rows(self, scan_data: Dict[str, Any]) -> str:
+        """Generate table rows for all scan results"""
+        results = scan_data.get('scan_results', [])
+        rows = ""
+        
+        for result in results:
+            status_class = f"status-{result.get('status', 0)}"
+            type_indicator = "📁" if result.get('is_directory', False) else "📄"
+            
+            rows += f"""
+            <tr>
+                <td>{html.escape(result.get('path', ''))}</td>
+                <td class="{status_class}">{result.get('status', '')}</td>
+                <td>{type_indicator} {'Directory' if result.get('is_directory', False) else 'File'}</td>
+                <td>{result.get('size', 0)}</td>
+                <td>{html.escape(result.get('content_type', 'N/A') or 'N/A')}</td>
+                <td>{result.get('response_time', 0):.3f}s</td>
+            </tr>
+            """
+        
+        return rows
+    
+    def _generate_directories_html(self, summary: Dict[str, Any]) -> str:
+        """Generate directories section HTML"""
+        directories = summary.get('directory_list', [])
+        
+        if not directories:
+            return '<p>No directories found during the scan.</p>'
+        
+        html_content = f"""
+        <div class="directories-summary">
+            <p><strong>Total Directories Found:</strong> {summary.get('directories_found', 0)}</p>
+            <p>The following directories were discovered and may contain additional resources:</p>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Directory Path</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+        """
+        
+        for directory in directories:
+            html_content += f"""
+                <tr>
+                    <td>📁 {html.escape(str(directory))}</td>
+                    <td><span class="badge">Consider recursive scan</span></td>
+                </tr>
+            """
+        
+        html_content += """
+                </tbody>
+            </table>
+            
+            <div class="recommendation">
+                <strong>Recommendation:</strong> These directories may contain additional files and subdirectories. 
+                Consider running recursive scans on promising directories to discover more content.
+            </div>
+        </div>
+        """
+        
+        return html_content
+    
+    def _generate_scan_config_html(self, scan_data: Dict[str, Any]) -> str:
+        """Generate scan configuration section for HTML"""
+        scan_config = scan_data.get('scan_config', {})
+        
+        return f"""
+        <div class="section">
+            <h2>Scan Configuration</h2>
+            <div class="section-content">
+                <div class="config-grid">
+                    <div class="config-item">
+                        <span class="config-label">Wordlist:</span>
+                        <span class="config-value">{html.escape(str(scan_config.get('wordlist', 'default')))}</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Threads:</span>
+                        <span class="config-value">{scan_config.get('threads', 10)}</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Extensions:</span>
+                        <span class="config-value">{', '.join(scan_config.get('extensions', [])) or 'None'}</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Recursive:</span>
+                        <span class="config-value">{'Yes' if scan_config.get('recursive', False) else 'No'}</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Follow Redirects:</span>
+                        <span class="config-value">{'Yes' if scan_config.get('follow_redirects', False) else 'No'}</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Wildcard Detection:</span>
+                        <span class="config-value">{'Enabled' if scan_config.get('detect_wildcards', True) else 'Disabled'}</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">User Agent:</span>
+                        <span class="config-value">{html.escape(str(scan_config.get('user_agent', 'Default')[:50]))}</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Intelligence Mode:</span>
+                        <span class="config-value">{scan_data.get('intelligence_mode', 'LOCAL')}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """
+    
+    def _generate_scan_summary_html(self, scan_data: Dict[str, Any]) -> str:
+        """Generate scan summary section for HTML"""
+        duration = scan_data.get('duration', 0)
+        results = scan_data.get('scan_results', [])
+        
+        # Count by status
+        status_counts = {}
+        for result in results:
+            status = result.get('status', 0)
+            status_counts[status] = status_counts.get(status, 0) + 1
+        
+        return f"""
+        <div class="section">
+            <h2>Scan Summary</h2>
+            <div class="section-content">
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">{len(results)}</span>
+                        <span class="stat-label">Total Findings</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{duration:.1f}s</span>
+                        <span class="stat-label">Duration</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{status_counts.get(200, 0)}</span>
+                        <span class="stat-label">200 OK</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{status_counts.get(301, 0) + status_counts.get(302, 0)}</span>
+                        <span class="stat-label">Redirects</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{status_counts.get(403, 0)}</span>
+                        <span class="stat-label">Forbidden</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{status_counts.get(401, 0)}</span>
+                        <span class="stat-label">Unauthorized</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """
+    
+    def _generate_directory_tree_html(self, scan_data: Dict[str, Any]) -> str:
+        """Generate directory tree visualization for HTML report"""
+        tree_data = self._generate_directory_tree(scan_data)
+        
+        return f"""
+        <div class="section primary-section">
+            <h2>📁 Directory Structure</h2>
+            <div class="section-content">
+                <div class="tree-container">
+                    <div class="tree-visualization">
+                        <pre style="background-color: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; line-height: 1.5;">
+{html.escape(str(tree_data.get('visualization', '')))}
+                        </pre>
+                    </div>
+                    
+                    <div class="tree-info">
+                        <div class="tree-statistics">
+                            <h3>Statistics</h3>
+                            <div class="stat-grid">
+                                <div class="tree-stat">
+                                    <span class="tree-stat-value">{tree_data.get('total_items', 0)}</span>
+                                    <span class="tree-stat-label">Total Items</span>
+                                </div>
+                                <div class="tree-stat">
+                                    <span class="tree-stat-value">{tree_data.get('statistics', {}).get('total_directories', 0)}</span>
+                                    <span class="tree-stat-label">Directories</span>
+                                </div>
+                                <div class="tree-stat">
+                                    <span class="tree-stat-value">{tree_data.get('statistics', {}).get('total_files', 0)}</span>
+                                    <span class="tree-stat-label">Files</span>
+                                </div>
+                                <div class="tree-stat">
+                                    <span class="tree-stat-value">{tree_data.get('statistics', {}).get('max_depth', 0)}</span>
+                                    <span class="tree-stat-label">Max Depth</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tree-legend">
+                            <h3>Legend</h3>
+                            <div class="legend-grid">
+                                <div class="legend-item"><span>📁</span> Directory</div>
+                                <div class="legend-item"><span>📄</span> File</div>
+                                <div class="legend-item"><span>🟢</span> 200 OK</div>
+                                <div class="legend-item"><span>🟡</span> Redirect</div>
+                                <div class="legend-item"><span>🔴</span> Forbidden</div>
+                                <div class="legend-item"><span>🔒</span> Auth Required</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """
+    
+    def _generate_directory_tree(self, scan_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate directory tree structure from scan results"""
+        results = scan_data.get('scan_results', [])
+        
+        # Build tree structure
+        tree = {}
+        root_url = scan_data.get('target_url', '')
+        
+        for result in results:
+            if not isinstance(result, dict):
+                continue
+                
+            path = result.get('path', '')
+            if not path:
+                continue
+                
+            status = result.get('status', 0)
+            is_directory = result.get('is_directory', False)
+            size = result.get('size', 0)
+            
+            # Parse path into segments
+            segments = [s for s in str(path).strip('/').split('/') if s]
+            
+            if not segments:
+                continue
+            
+            # Navigate to the correct position in tree
+            current = tree
+            for i, segment in enumerate(segments):
+                if segment not in current:
+                    current[segment] = {
+                        '_meta': {
+                            'type': 'directory' if i < len(segments) - 1 or is_directory else 'file',
+                            'status': None,
+                            'size': None,
+                            'path': '/' + '/'.join(segments[:i+1])
+                        },
+                        '_children': {}
+                    }
+                
+                # Update meta for the final segment
+                if i == len(segments) - 1:
+                    current[segment]['_meta']['status'] = status
+                    current[segment]['_meta']['size'] = size
+                    current[segment]['_meta']['type'] = 'directory' if is_directory else 'file'
+                
+                current = current[segment]['_children']
+        
+        # Generate tree visualization
+        tree_lines = []
+        self._build_tree_lines(tree, tree_lines, '', True)
+        
+        # Calculate statistics
+        stats = self._calculate_tree_stats(tree)
+        
+        return {
+            'structure': tree,
+            'visualization': '\n'.join(tree_lines) if tree_lines else '',
+            'statistics': stats,
+            'total_items': len(results)
+        }
+    
+    def _build_tree_lines(self, tree: Dict, lines: List[str], prefix: str, is_last: bool):
+        """Build tree visualization lines recursively"""
+        items = sorted(tree.items())
+        
+        for i, (name, node) in enumerate(items):
+            if name == '_meta':
+                continue
+            
+            is_last_item = i == len(items) - 1
+            
+            # Build current line
+            if prefix == '':
+                connector = ''
+                extension = ''
+            else:
+                connector = '└── ' if is_last_item else '├── '
+                extension = '    ' if is_last_item else '│   '
+            
+            meta = node.get('_meta', {})
+            status = meta.get('status', '')
+            item_type = meta.get('type', 'unknown')
+            
+            # Status indicators
+            status_icon = ''
+            if status == 200:
+                status_icon = ' 🟢'
+            elif status in [301, 302]:
+                status_icon = ' 🟡'
+            elif status == 403:
+                status_icon = ' 🔴'
+            elif status == 401:
+                status_icon = ' 🔒'
+            elif status == 404:
+                status_icon = ' ⚫'
+            
+            # Type indicator
+            type_icon = '📁' if item_type == 'directory' else '📄'
+            
+            # Build line
+            line = f"{prefix}{connector}{type_icon} {name}{status_icon}"
+            if status:
+                line += f" [{status}]"
+            
+            lines.append(line)
+            
+            # Process children
+            children = node.get('_children', {})
+            if children:
+                new_prefix = prefix + extension
+                self._build_tree_lines(children, lines, new_prefix, is_last_item)
+    
+    def _calculate_tree_stats(self, tree: Dict, depth: int = 0) -> Dict[str, Any]:
+        """Calculate statistics from tree structure"""
+        stats = {
+            'max_depth': depth,
+            'total_directories': 0,
+            'total_files': 0,
+            'by_status': {},
+            'by_depth': {}
+        }
+        
+        for name, node in tree.items():
+            if name == '_meta':
+                continue
+            
+            meta = node.get('_meta', {})
+            item_type = meta.get('type', 'unknown')
+            status = meta.get('status')
+            
+            # Count by type
+            if item_type == 'directory':
+                stats['total_directories'] += 1
+            else:
+                stats['total_files'] += 1
+            
+            # Count by status
+            if status:
+                status_str = str(status)
+                stats['by_status'][status_str] = stats['by_status'].get(status_str, 0) + 1
+            
+            # Count by depth
+            stats['by_depth'][str(depth)] = stats['by_depth'].get(str(depth), 0) + 1
+            
+            # Process children
+            children = node.get('_children', {})
+            if children:
+                child_stats = self._calculate_tree_stats(children, depth + 1)
+                stats['max_depth'] = max(stats['max_depth'], child_stats['max_depth'])
+                stats['total_directories'] += child_stats['total_directories']
+                stats['total_files'] += child_stats['total_files']
+                
+                # Merge status counts
+                for status, count in child_stats['by_status'].items():
+                    stats['by_status'][status] = stats['by_status'].get(status, 0) + count
+                
+                # Merge depth counts
+                for d, count in child_stats['by_depth'].items():
+                    stats['by_depth'][d] = stats['by_depth'].get(d, 0) + count
+        
+        return stats
+    
+    def _generate_directory_tree_md(self, scan_data: Dict[str, Any]) -> str:
+        """Generate directory tree for Markdown report"""
+        tree_data = self._generate_directory_tree(scan_data)
+        
+        return f"""
+### Statistics
+
+- **Total Items:** {tree_data.get('total_items', 0)}
+- **Directories:** {tree_data.get('statistics', {}).get('total_directories', 0)}
+- **Files:** {tree_data.get('statistics', {}).get('total_files', 0)}
+- **Maximum Depth:** {tree_data.get('statistics', {}).get('max_depth', 0)}
+
+### Status Distribution
+
+| Status Code | Count |
+|------------|-------|
+{self._format_status_table_md(tree_data.get('statistics', {}).get('by_status', {}))}
+
+### Directory Structure
+
+```
+{tree_data.get('visualization', '')}
+```
+
+### Legend
+
+- 📁 Directory
+- 📄 File
+- 🟢 200 OK
+- 🟡 301/302 Redirect
+- 🔴 403 Forbidden
+- 🔒 401 Unauthorized
+- ⚫ 404 Not Found
+"""
+    
+    def _format_status_table_md(self, status_dict: Dict[str, int]) -> str:
+        """Format status distribution for markdown table"""
+        rows = []
+        for status, count in sorted(status_dict.items()):
+            rows.append(f"| {status} | {count} |")
+        return '\n'.join(rows) if rows else '| No data | 0 |'
+    
+    def _generate_scan_summary_md(self, scan_data: Dict[str, Any]) -> str:
+        """Generate scan summary for Markdown"""
+        duration = scan_data.get('duration', 0)
+        results = scan_data.get('scan_results', [])
+        
+        # Count by status
+        status_counts = {}
+        for result in results:
+            status = result.get('status', 0)
+            status_counts[status] = status_counts.get(status, 0) + 1
+        
+        return f"""
+- **Total Findings:** {len(results)}
+- **Scan Duration:** {duration:.1f} seconds
+- **200 OK:** {status_counts.get(200, 0)}
+- **301/302 Redirects:** {status_counts.get(301, 0) + status_counts.get(302, 0)}
+- **403 Forbidden:** {status_counts.get(403, 0)}
+- **401 Unauthorized:** {status_counts.get(401, 0)}
+"""

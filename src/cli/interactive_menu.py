@@ -54,10 +54,14 @@ class InteractiveMenu:
         self.current_scan = None
         self.scan_history = []
         self.custom_wordlists = []
+        self.interrupted = False
         
     def _handle_exit(self):
         """Handle graceful exit"""
         self.console.print("\n[yellow]Shutting down...[/yellow]")
+        # Stop any running scan
+        if hasattr(self, 'dirsearch_engine') and self.dirsearch_engine:
+            self.dirsearch_engine.stop_scan()
         self.console.print("[green]Thank you for using Dirsearch MCP![/green]")
         sys.exit(0)
         
@@ -99,10 +103,14 @@ class InteractiveMenu:
                     elif choice == '2':
                         await self._advanced_scan()
                     elif choice == '3':
-                        self._view_reports()
+                        await self._smart_scan()
                     elif choice == '4':
-                        await self._configuration_management()
+                        await self._full_bruteforce_scan()
                     elif choice == '5':
+                        self._view_reports()
+                    elif choice == '6':
+                        await self._configuration_management()
+                    elif choice == '7':
                         self._show_help()
                     elif choice == '0':
                         if Confirm.ask("[yellow]Are you sure you want to exit?[/yellow]"):
@@ -112,9 +120,14 @@ class InteractiveMenu:
                         self.console.print("[red]Invalid choice. Please try again.[/red]")
                 except KeyboardInterrupt:
                     self._handle_exit()
+                except asyncio.CancelledError:
+                    self.console.print("\n[yellow]Operation cancelled[/yellow]")
+                    self._handle_exit()
                 except EOFError:
                     self._handle_exit()
         except KeyboardInterrupt:
+            self._handle_exit()
+        except asyncio.CancelledError:
             self._handle_exit()
         except Exception as e:
             self.console.print(f"[red]Error: {e}[/red]")
@@ -160,9 +173,11 @@ class InteractiveMenu:
         
         menu.add_row("1", "🚀 Quick Scan (MCP Auto-Configure)")
         menu.add_row("2", "⚙️  Advanced Scan (Manual Configuration)")
-        menu.add_row("3", "📊 View Previous Reports")
-        menu.add_row("4", "⚡ Configuration Management")
-        menu.add_row("5", "❓ Help & Documentation")
+        menu.add_row("3", "🧠 Smart Scan (Intelligent Discovery)")
+        menu.add_row("4", "👹 Monster Mode (Maximum Discovery)")
+        menu.add_row("5", "📊 View Previous Reports")
+        menu.add_row("6", "⚡ Configuration Management")
+        menu.add_row("7", "❓ Help & Documentation")
         menu.add_row("0", "🚪 Exit")
         
         self.console.print(menu)
@@ -172,10 +187,10 @@ class InteractiveMenu:
         # Allow "exit" as well as menu numbers
         while True:
             choice = Prompt.ask("\n[bold cyan]Select an option[/bold cyan]")
-            if choice.lower() == 'exit' or choice in ['0', '1', '2', '3', '4', '5']:
+            if choice.lower() == 'exit' or choice in ['0', '1', '2', '3', '4', '5', '6', '7']:
                 return choice
             else:
-                self.console.print("[red]Invalid choice. Please enter 0-5 or 'exit'[/red]")
+                self.console.print("[red]Invalid choice. Please enter 0-7 or 'exit'[/red]")
     
     async def _quick_scan(self):
         """Quick scan with MCP auto-configuration"""
@@ -195,6 +210,13 @@ class InteractiveMenu:
             await self._execute_scan(target_url, quick_mode=True)
         except KeyboardInterrupt:
             self.console.print("\n[yellow]Scan interrupted by user[/yellow]")
+            if hasattr(self, 'dirsearch_engine') and self.dirsearch_engine:
+                self.dirsearch_engine.stop_scan()
+            return
+        except asyncio.CancelledError:
+            self.console.print("\n[yellow]Scan cancelled[/yellow]")
+            if hasattr(self, 'dirsearch_engine') and self.dirsearch_engine:
+                self.dirsearch_engine.stop_scan()
             return
     
     async def _advanced_scan(self):
@@ -215,6 +237,289 @@ class InteractiveMenu:
             await self._execute_scan(target_url, quick_mode=False, custom_config=config)
         except KeyboardInterrupt:
             self.console.print("\n[yellow]Scan interrupted by user[/yellow]")
+            if hasattr(self, 'dirsearch_engine') and self.dirsearch_engine:
+                self.dirsearch_engine.stop_scan()
+            return
+        except asyncio.CancelledError:
+            self.console.print("\n[yellow]Scan cancelled[/yellow]")
+            if hasattr(self, 'dirsearch_engine') and self.dirsearch_engine:
+                self.dirsearch_engine.stop_scan()
+            return
+    
+    async def _smart_scan(self):
+        """Smart scan with intelligent discovery"""
+        try:
+            self.console.print("\n[bold cyan]🧠 Smart Scan Mode[/bold cyan]")
+            self.console.print("[dim]Intelligent discovery with rule-based optimization[/dim]\n")
+            
+            # Get target URL
+            target_url = self._get_target_url()
+            if not target_url:
+                return
+            
+            # Smart scan configuration
+            config = {
+                # Use critical wordlists
+                'wordlist': 'critical-admin.txt',
+                'wordlist_type': 'critical',
+                'additional_wordlists': ['critical-api.txt', 'critical-backup.txt'],
+                
+                # Smart extensions based on technology
+                'extensions': ['php', 'asp', 'aspx', 'jsp', 'html', 'json', 'xml', 'sql', 'zip', 'bak'],
+                
+                # Optimized performance
+                'threads': 20,
+                'timeout': 15,
+                'delay': 0,
+                
+                # Smart recursion
+                'recursive': True,
+                'recursion_depth': 3,
+                
+                # Focus on important status codes
+                'exclude_status': '404',
+                'include_status': '200,201,301,302,401,403,500',
+                
+                # Retry configuration
+                'max_retries': 3,
+                'follow_redirects': True,
+                
+                # Headers for better discovery
+                'custom_headers': {
+                    'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+                    'Accept': '*/*',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                
+                # MCP settings
+                'mcp_mode': 'smart',
+                'mcp_confidence_threshold': 0.6,
+                'mcp_smart_filtering': True
+            }
+            
+            # Show smart scan features
+            features_table = Table(title="[bold]🧠 Smart Scan Features[/bold]", show_header=True)
+            features_table.add_column("Feature", style="cyan")
+            features_table.add_column("Description", style="yellow")
+            
+            features_table.add_row("Intelligent Wordlists", "Focus on critical endpoints (admin, API, backups)")
+            features_table.add_row("Rule-based Discovery", "Prioritize high-value paths")
+            features_table.add_row("Dynamic Expansion", "Expand wordlist based on discoveries")
+            features_table.add_row("Smart Extensions", "Technology-aware file extensions")
+            features_table.add_row("Priority Scanning", "Scan important paths first")
+            features_table.add_row("Risk Assessment", "Real-time security analysis")
+            
+            self.console.print(features_table)
+            
+            # Start smart scan
+            if Confirm.ask("\n[cyan]Start intelligent scan?[/cyan]"):
+                self.console.print("\n[bold cyan]🧠 Initiating Smart Scan...[/bold cyan]")
+                await self._execute_scan(target_url, quick_mode=False, custom_config=config, scan_type="smart")
+            
+        except KeyboardInterrupt:
+            self.console.print("\n[yellow]Smart scan interrupted by user[/yellow]")
+            return
+    
+    async def _full_bruteforce_scan(self):
+        """Monster Mode - Maximum discovery with aggressive settings"""
+        try:
+            self.console.print("\n[bold red]👹 MONSTER MODE ACTIVATED 👹[/bold red]")
+            self.console.print("[yellow]⚠️  WARNING: EXTREMELY AGGRESSIVE SCANNING MODE[/yellow]")
+            self.console.print("[dim]• All wordlists combined • Maximum threads • All extensions • Deep recursion[/dim]\n")
+            
+            # Warning confirmation
+            if not Confirm.ask("\n[yellow]This scan will generate significant traffic. Continue?[/yellow]"):
+                return
+            
+            # Get target URL
+            target_url = self._get_target_url()
+            if not target_url:
+                return
+            
+            # Build aggressive configuration
+            config = {
+                # Use comprehensive bruteforce wordlist
+                'wordlist': 'monster-all.txt',  # Just the filename, not the path
+                'wordlist_type': 'enhanced',
+                'additional_wordlists': [],  # Already combined in monster-all.txt
+                
+                # Maximum extensions coverage
+                'extensions': [
+                    # Web files
+                    'php', 'html', 'htm', 'asp', 'aspx', 'jsp', 'jspx', 'do', 'action',
+                    'pl', 'cgi', 'py', 'rb', 'js', 'css', 'xml', 'rss', 'atom',
+                    
+                    # Data files
+                    'json', 'yaml', 'yml', 'xml', 'csv', 'txt', 'log', 'md',
+                    
+                    # Config files
+                    'conf', 'config', 'ini', 'env', 'properties', 'cfg',
+                    
+                    # Backup files
+                    'bak', 'backup', 'old', 'orig', 'save', 'swp', 'swo', '~',
+                    'tmp', 'temp', 'copy', 'dist',
+                    
+                    # Archive files
+                    'zip', 'tar', 'gz', 'bz2', 'rar', '7z', 'tgz',
+                    
+                    # Database files
+                    'sql', 'db', 'sqlite', 'sqlite3', 'mdb',
+                    
+                    # Document files
+                    'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'
+                ],
+                
+                # Maximum performance settings
+                'threads': 50,  # Aggressive threading
+                'timeout': 30,  # Longer timeout for slow responses
+                'delay': 0,     # No delay between requests
+                
+                # Maximum recursion
+                'recursive': True,
+                'recursion_depth': 5,  # Deep recursion
+                
+                # Include all status codes
+                'exclude_status': '',  # Don't exclude any status
+                'include_status': '200,201,204,301,302,307,308,400,401,403,405,500,502,503',
+                
+                # Aggressive retry
+                'max_retries': 5,
+                
+                # Don't follow redirects to capture 301 status
+                'follow_redirects': False,
+                
+                # Enable advanced features
+                'crawl': True,  # Enable content analysis
+                'detect_wildcards': True,  # Enable wildcard detection
+                'random_user_agents': True,  # Use random user agents
+                
+                # Custom headers for better results
+                'custom_headers': {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'Accept': '*/*',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                    'Accept-Encoding': 'gzip, deflate',
+                    'Cache-Control': 'no-cache',
+                    'X-Forwarded-For': '127.0.0.1',
+                    'X-Originating-IP': '127.0.0.1',
+                    'X-Remote-IP': '127.0.0.1',
+                    'X-Remote-Addr': '127.0.0.1'
+                },
+                
+                # MCP settings for aggressive scanning
+                'mcp_mode': 'aggressive',
+                'mcp_confidence_threshold': 0.3,  # Lower threshold
+                'mcp_max_depth': 5,
+                'mcp_smart_filtering': False  # Disable filtering for max results
+            }
+            
+            # Show COMPLETE configuration summary
+            self.console.print("\n[bold red]🔥 MONSTER MODE CONFIGURATION 🔥[/bold red]")
+            
+            # Basic settings table
+            basic_table = Table(title="[bold]Basic Settings[/bold]", show_header=True)
+            basic_table.add_column("Setting", style="cyan", width=20)
+            basic_table.add_column("Value", style="yellow")
+            basic_table.add_column("Description", style="dim")
+            
+            basic_table.add_row("Target URL", target_url, "Base URL to attack")
+            basic_table.add_row("Wordlist", "monster-all.txt", "👹 ~6,800 unique paths")
+            basic_table.add_row("Extensions", f"{len(config['extensions'])} types", ", ".join(config['extensions'][:10]) + "...")
+            basic_table.add_row("Threads", str(config['threads']), "Maximum concurrent requests")
+            basic_table.add_row("Timeout", f"{config['timeout']}s", "Per request timeout")
+            basic_table.add_row("Delay", f"{config['delay']}s", "Between requests")
+            basic_table.add_row("Retries", str(config['max_retries']), "Failed request retries")
+            
+            self.console.print(basic_table)
+            
+            # Recursion settings
+            recursion_table = Table(title="\n[bold]Recursion Settings[/bold]", show_header=True)
+            recursion_table.add_column("Setting", style="cyan", width=20)
+            recursion_table.add_column("Value", style="yellow")
+            recursion_table.add_column("Impact", style="dim")
+            
+            recursion_table.add_row("Recursive", "✓ ENABLED", "Scan found directories")
+            recursion_table.add_row("Max Depth", str(config['recursion_depth']), "Levels to go deep")
+            recursion_table.add_row("Follow Redirects", "✗ NO", "Capture 301 for recursive scan")
+            recursion_table.add_row("301 Recursive", "✓ ENABLED", "Scan inside 301 redirects")
+            recursion_table.add_row("Content Analysis", "✓ ENABLED", "Extract hidden paths")
+            
+            self.console.print(recursion_table)
+            
+            # Status code configuration
+            status_table = Table(title="\n[bold]Status Code Configuration[/bold]", show_header=True)
+            status_table.add_column("Setting", style="cyan", width=20)
+            status_table.add_column("Value", style="yellow")
+            
+            status_table.add_row("Include Codes", config.get('include_status', 'ALL'), "Capture everything")
+            status_table.add_row("Exclude Codes", config.get('exclude_status', 'NONE'), "No filtering")
+            
+            self.console.print(status_table)
+            
+            # Headers table
+            headers_table = Table(title="\n[bold]Custom Headers (Bypass Techniques)[/bold]", show_header=True)
+            headers_table.add_column("Header", style="cyan")
+            headers_table.add_column("Value", style="yellow")
+            
+            for header, value in config['custom_headers'].items():
+                headers_table.add_row(header, value)
+            
+            self.console.print(headers_table)
+            
+            # MCP settings
+            mcp_table = Table(title="\n[bold]MCP Intelligence Settings[/bold]", show_header=True)
+            mcp_table.add_column("Setting", style="cyan", width=20)
+            mcp_table.add_column("Value", style="yellow")
+            mcp_table.add_column("Effect", style="dim")
+            
+            mcp_table.add_row("Mode", config['mcp_mode'].upper(), "Aggressive scanning")
+            mcp_table.add_row("Confidence", f"{config['mcp_confidence_threshold']*100}%", "Low threshold = more results")
+            mcp_table.add_row("Smart Filter", "✗ DISABLED", "No result filtering")
+            mcp_table.add_row("Max Depth", str(config['mcp_max_depth']), "MCP recursion depth")
+            
+            self.console.print(mcp_table)
+            
+            # Estimated impact
+            self.console.print("\n[bold yellow]📊 ESTIMATED SCAN IMPACT:[/bold yellow]")
+            # Note: If extensions are provided, each word generates multiple requests
+            num_extensions = len(config['extensions'])
+            base_words = 6800
+            if num_extensions > 0:
+                total_requests = base_words + (base_words * num_extensions)  # word + word.ext for each extension
+            else:
+                total_requests = base_words
+            
+            self.console.print(f"  • Wordlist entries: {base_words:,}")
+            self.console.print(f"  • Extensions to test: {num_extensions}")
+            self.console.print(f"  • Base requests: ~{total_requests:,}")
+            self.console.print(f"  • With recursion (depth {config['recursion_depth']}): ~{total_requests * 3:,}+ requests")
+            self.console.print(f"  • Estimated time: {(total_requests * 3 / config['threads'] / 10):.0f}+ minutes")
+            self.console.print(f"  • Network usage: EXTREME")
+            self.console.print(f"  • Server load: CATASTROPHIC")
+            
+            # Performance warning
+            self.console.print("\n[yellow]⚠️  Performance Impact:[/yellow]")
+            self.console.print("• High bandwidth usage")
+            self.console.print("• May trigger rate limiting or WAF")
+            self.console.print("• Extended scan duration")
+            
+            # Final warning
+            self.console.print("\n[bold red]⚠️  FINAL WARNING ⚠️[/bold red]")
+            self.console.print("[yellow]This scan will:[/yellow]")
+            self.console.print("  • Generate massive amounts of traffic")
+            self.console.print("  • Potentially trigger security systems")
+            self.console.print("  • Take significant time to complete")
+            self.console.print("  • May impact target server performance")
+            
+            if Confirm.ask("\n[bold red]Are you ABSOLUTELY SURE you want to unleash the MONSTER?[/bold red]"):
+                self.console.print("\n[bold red]🔥 MONSTER MODE ENGAGED 🔥[/bold red]")
+                self.console.print("[dim]Starting aggressive scan...[/dim]\n")
+                # Start aggressive scan
+                await self._execute_scan(target_url, quick_mode=False, custom_config=config, scan_type="monster")
+            
+        except KeyboardInterrupt:
+            self.console.print("\n[yellow]Monster mode interrupted by user[/yellow]")
+            self.console.print("[dim]The monster returns to its cage...[/dim]")
             return
     
     def _get_target_url(self) -> Optional[str]:
@@ -398,6 +703,7 @@ class InteractiveMenu:
     def _get_available_wordlists(self) -> List[Tuple[str, str]]:
         """Get available wordlists with descriptions"""
         wordlists = [
+            ("monster-all.txt", "👹 MONSTER: All wordlists combined (~6800 entries)"),
             ("combined-enhanced.txt", "Enhanced combined wordlist (recommended)"),
             ("api-endpoints.txt", "API-specific endpoints and nested paths"),
             ("hidden-files.txt", "Hidden files and sensitive data"),
@@ -431,7 +737,7 @@ class InteractiveMenu:
         self.console.print(Rule(style="dim"))
         
         # Request options
-        config['follow_redirects'] = Confirm.ask("Follow redirects?", default=True)
+        config['follow_redirects'] = Confirm.ask("Follow redirects? (No = capture 301 for recursive scan)", default=False)
         
         config['user_agent'] = Prompt.ask(
             "User-Agent string",
@@ -483,10 +789,47 @@ class InteractiveMenu:
         
         if config['recursive']:
             config['recursion_depth'] = IntPrompt.ask(
-                "Maximum recursion depth",
+                "Maximum recursion depth (0 = unlimited)",
                 default=3,
-                choices=[str(i) for i in range(1, 11)]
+                choices=[str(i) for i in range(0, 11)]
             )
+        
+        # Advanced features
+        self.console.print("\n[bold]Advanced Features:[/bold]")
+        config['crawl'] = Confirm.ask(
+            "Enable content analysis? (extract hidden paths from responses)",
+            default=True
+        )
+        
+        config['detect_wildcards'] = Confirm.ask(
+            "Enable wildcard detection?",
+            default=True
+        )
+        
+        config['random_user_agents'] = Confirm.ask(
+            "Use random user agents?",
+            default=False
+        )
+        
+        # Debug monitor option
+        config['debug_enabled'] = Confirm.ask(
+            "Enable real-time debug monitor? (shows detailed scan progress)",
+            default=False
+        )
+        
+        if config['debug_enabled']:
+            config['debug_live_display'] = Confirm.ask(
+                "Show live debug display?",
+                default=True
+            )
+            
+            if Confirm.ask("Export debug data after scan?"):
+                config['debug_export_path'] = Prompt.ask(
+                    "Export filename",
+                    default=f"debug_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                )
+            else:
+                config['debug_export_path'] = None
     
     async def _configure_mcp_behavior(self, config: Dict[str, Any]):
         """Configure MCP behavior"""
@@ -529,7 +872,8 @@ class InteractiveMenu:
             )
     
     async def _execute_scan(self, target_url: str, quick_mode: bool = True, 
-                          custom_config: Optional[Dict[str, Any]] = None):
+                          custom_config: Optional[Dict[str, Any]] = None,
+                          scan_type: str = "normal"):
         """Execute scan with real-time progress display"""
         start_time = time.time()
         
@@ -567,12 +911,19 @@ class InteractiveMenu:
         }
         
         with Live(layout, console=self.console, refresh_per_second=4) as live:
-            # Header
+            # Header with scan type indication
+            scan_mode_text = {
+                "normal": "Normal Scan",
+                "quick": "Quick Scan",
+                "bruteforce": "[bold red]BRUTEFORCE MODE[/bold red]",
+                "monster": "[bold red]👹 MONSTER MODE 👹[/bold red]"
+            }.get(scan_type, "Custom Scan")
+            
             layout["header"].update(
                 Panel(
-                    Align.center(f"[bold cyan]Scanning:[/bold cyan] {target_url}"),
+                    Align.center(f"[bold cyan]Scanning:[/bold cyan] {target_url}\n[dim]{scan_mode_text}[/dim]"),
                     title="🎯 Dirsearch MCP",
-                    border_style="cyan"
+                    border_style="red" if scan_type in ["bruteforce", "monster"] else "cyan"
                 )
             )
             
@@ -599,6 +950,14 @@ class InteractiveMenu:
             layout["mcp"].update(Panel(mcp_text, border_style="yellow"))
             
             # Log MCP decision
+            mcp_decision = {
+                'type': 'target_analysis',
+                'context': {'url': target_url},
+                'decision': f"Detected: {target_info.server_type}, CMS: {target_info.detected_cms}",
+                'confidence': 0.9,
+                'timestamp': datetime.now().isoformat()
+            }
+            scan_data['mcp_decisions'].append(mcp_decision)
             LoggerSetup.log_mcp_decision(
                 'target_analysis',
                 {'url': target_url},
@@ -621,6 +980,20 @@ class InteractiveMenu:
                 scan_plan = await self._generate_custom_scan_plan(target_info, custom_config)
             
             scan_data['scan_plan'] = [self._serialize_scan_task(task) for task in scan_plan]
+            
+            # Log MCP scan plan decision
+            scan_plan_decision = {
+                'type': 'scan_plan_generation',
+                'context': {
+                    'target': target_url,
+                    'mode': self.mcp_coordinator.intelligence_mode,
+                    'tasks_count': len(scan_plan)
+                },
+                'decision': f"Generated {len(scan_plan)} scan tasks with {scan_config.get('wordlist', 'default')} wordlist",
+                'confidence': 0.85,
+                'timestamp': datetime.now().isoformat()
+            }
+            scan_data['mcp_decisions'].append(scan_plan_decision)
             
             # Display scan plan with MCP task distribution
             plan_text = Text()
@@ -661,6 +1034,8 @@ class InteractiveMenu:
             scan_request = ScanRequest(
                 base_url=target_url,
                 wordlist=scan_config.get('wordlist', 'common.txt'),
+                wordlist_type=scan_config.get('wordlist_type', 'enhanced'),
+                additional_wordlists=scan_config.get('additional_wordlists', []),
                 extensions=scan_config.get('extensions', []),
                 threads=scan_config.get('threads', 10),
                 timeout=scan_config.get('timeout', 10),
@@ -673,7 +1048,10 @@ class InteractiveMenu:
                 exclude_status=scan_config.get('exclude_status', '404'),
                 include_status=scan_config.get('include_status'),
                 recursive=scan_config.get('recursive', True),  # Default to True
-                recursion_depth=scan_config.get('recursion_depth', 3)  # Default to 3
+                recursion_depth=scan_config.get('recursion_depth', 3),  # Default to 3
+                debug_enabled=scan_config.get('debug_enabled', False),
+                debug_live_display=scan_config.get('debug_live_display', True),
+                debug_export_path=scan_config.get('debug_export_path')
             )
             
             # Real-time progress tracking
@@ -746,6 +1124,21 @@ class InteractiveMenu:
                             mcp_text.append("• Found auth endpoints\n", style="dim")
                         if any(f.status_code in [301, 302] for f in progress_info['findings']):
                             mcp_text.append("• Redirect patterns detected\n", style="dim")
+                        
+                        # Log MCP findings analysis
+                        if len(progress_info['findings']) % 10 == 0:  # Log every 10 findings
+                            findings_analysis = {
+                                'type': 'findings_analysis',
+                                'context': {
+                                    'total_findings': len(progress_info['findings']),
+                                    'interesting_findings': len([f for f in progress_info['findings'] if f.status_code in [200, 301, 302, 401, 403]]),
+                                    'directories_found': len([f for f in progress_info['findings'] if f.is_directory])
+                                },
+                                'decision': f"Found {len(progress_info['findings'])} paths, analyzing patterns",
+                                'confidence': 0.75,
+                                'timestamp': datetime.now().isoformat()
+                            }
+                            scan_data['mcp_decisions'].append(findings_analysis)
                     
                     layout["mcp"].update(Panel(mcp_text, border_style="cyan"))
             
@@ -758,8 +1151,13 @@ class InteractiveMenu:
             self.dirsearch_engine.set_result_callback(on_result)
             self.dirsearch_engine.set_error_callback(on_error)
             
-            # Execute scan
-            scan_response = await self.dirsearch_engine.execute_scan(scan_request)
+            # Execute scan with interrupt handling
+            try:
+                scan_response = await self.dirsearch_engine.execute_scan(scan_request)
+            except asyncio.CancelledError:
+                self.console.print("\n[yellow]Scan cancelled[/yellow]")
+                self.dirsearch_engine.stop_scan()
+                raise
             
             # Update results
             scan_data['scan_results'] = scan_response.results
@@ -787,15 +1185,45 @@ class InteractiveMenu:
         scan_data['end_time'] = datetime.now().isoformat()
         scan_data['duration'] = time.time() - start_time
         
+        # Add final MCP decision
+        final_decision = {
+            'type': 'scan_completion',
+            'context': {
+                'total_requests': scan_response.statistics.get('total_requests', 0),
+                'findings': findings_count,
+                'errors': scan_response.statistics.get('errors', 0),
+                'duration': scan_data['duration']
+            },
+            'decision': f"Scan completed with {findings_count} findings out of {scan_response.statistics.get('total_requests', 0)} requests",
+            'confidence': 0.95,
+            'timestamp': datetime.now().isoformat()
+        }
+        scan_data['mcp_decisions'].append(final_decision)
+        
         # Display summary
         self._display_scan_summary(scan_response, scan_data['duration'])
         
+        # Display intelligent insights for smart scan
+        if scan_type == "smart" and hasattr(self.dirsearch_engine, 'get_scan_insights'):
+            insights = self.dirsearch_engine.get_scan_insights()
+            self._display_scan_insights(insights)
+        
         # Save results option
         if Confirm.ask("\n[cyan]Save scan report?[/cyan]"):
-            report_files = self.report_generator.generate_report(scan_data)
-            self.console.print("\n[green]✅ Reports saved:[/green]")
-            for format, path in report_files.items():
-                self.console.print(f"  • {format.upper()}: {path}")
+            try:
+                # Include insights in report for smart scan
+                if scan_type == "smart" and hasattr(self.dirsearch_engine, 'get_scan_insights'):
+                    scan_data['intelligence_insights'] = self.dirsearch_engine.get_scan_insights()
+                
+                report_files = self.report_generator.generate_report(scan_data)
+                self.console.print("\n[green]✅ Reports saved:[/green]")
+                for format, path in report_files.items():
+                    self.console.print(f"  • {format.upper()}: {path}")
+            except Exception as e:
+                self.console.print(f"\n[red]Error: {e}[/red]")
+                import traceback
+                if self.logger:
+                    self.logger.error(f"Report generation error: {traceback.format_exc()}")
         
         # Add to history
         self.scan_history.append({
@@ -1004,7 +1432,7 @@ class InteractiveMenu:
         scan_node.add(f"Default threads: [green]{self.settings.default_scan_config.get('threads', 10)}[/green]")
         scan_node.add(f"Timeout: [green]{self.settings.default_scan_config.get('timeout', 10)}s[/green]")
         scan_node.add(f"User-Agent: [dim]{self.settings.default_scan_config.get('user_agent', 'Default')[:50]}...[/dim]")
-        scan_node.add(f"Follow redirects: [green]{'Yes' if self.settings.default_scan_config.get('follow_redirects', True) else 'No'}[/green]")
+        scan_node.add(f"Follow redirects: [green]{'Yes' if self.settings.default_scan_config.get('follow_redirects', False) else 'No'}[/green]")
         scan_node.add(f"Max retries: [green]{self.settings.default_scan_config.get('max_retries', 3)}[/green]")
         
         # AI configuration
@@ -1762,6 +2190,68 @@ Headers:
         
         return stats
     
+    def _display_scan_insights(self, insights: Dict[str, Any]):
+        """Display intelligent scan insights"""
+        self.console.print("\n[bold cyan]🧠 Intelligent Scan Insights[/bold cyan]")
+        self.console.print(Rule(style="cyan"))
+        
+        # Risk Assessment
+        risk = insights.get('risk_assessment', {})
+        risk_color = "red" if risk.get('level') == 'High' else "yellow" if risk.get('level') == 'Medium' else "green"
+        
+        risk_panel = Panel(
+            f"[bold {risk_color}]Risk Level: {risk.get('level', 'Unknown')} ({risk.get('score', 0)}/100)[/bold {risk_color}]\n\n" +
+            "\n".join(f"• {r}" for r in risk.get('risks', [])),
+            title="🔒 Security Risk Assessment",
+            border_style=risk_color
+        )
+        self.console.print(risk_panel)
+        
+        # Important Discoveries
+        if insights.get('important_paths'):
+            disc_table = Table(title="🎯 Important Discoveries", show_header=True)
+            disc_table.add_column("Path", style="cyan")
+            disc_table.add_column("Status", style="yellow")
+            disc_table.add_column("Priority", style="red")
+            
+            for path_info in insights['important_paths'][:10]:
+                disc_table.add_row(
+                    path_info['path'],
+                    str(path_info['status']),
+                    str(path_info['rules'][0][1]) if path_info['rules'] else "N/A"
+                )
+            
+            self.console.print(disc_table)
+        
+        # Technology Detection
+        if insights.get('technology_hints'):
+            tech_text = Text()
+            tech_text.append("🔧 Detected Technologies\n\n", style="bold")
+            for tech in insights['technology_hints']:
+                tech_text.append(f"  • {tech}\n", style="green")
+            
+            self.console.print(Panel(tech_text, border_style="green"))
+        
+        # Recommendations
+        if insights.get('recommendations'):
+            rec_text = Text()
+            rec_text.append("💡 Recommendations\n\n", style="bold yellow")
+            for i, rec in enumerate(insights['recommendations'], 1):
+                rec_text.append(f"{i}. {rec}\n", style="yellow")
+            
+            self.console.print(Panel(rec_text, border_style="yellow"))
+        
+        # Pattern Analysis
+        if insights.get('discovered_patterns'):
+            pattern_table = Table(title="📊 Discovered Patterns", show_header=True)
+            pattern_table.add_column("Pattern", style="cyan")
+            pattern_table.add_column("Count", style="yellow")
+            
+            for pattern, count in insights['discovered_patterns'].items():
+                pattern_table.add_row(pattern.upper(), str(count))
+            
+            self.console.print(pattern_table)
+    
     def _display_scan_summary(self, scan_response, duration: float):
         """Display scan summary after completion"""
         self.console.print("\n[bold green]✅ Scan Complete![/bold green]")
@@ -1779,34 +2269,144 @@ Headers:
         
         self.console.print(summary_table)
         
-        # Top findings
+        # Status code breakdown
         if scan_response.results:
-            self.console.print("\n[bold]Top Findings:[/bold]")
-            findings_table = Table()
-            findings_table.add_column("Path", style="cyan")
-            findings_table.add_column("Status", style="green")
-            findings_table.add_column("Size", justify="right")
-            findings_table.add_column("Type")
+            status_counts = {}
+            for result in scan_response.results:
+                status = result.get('status', 0)
+                status_counts[status] = status_counts.get(status, 0) + 1
             
-            # Sort by status code
-            sorted_results = sorted(scan_response.results, 
-                                  key=lambda x: (x['status'] != 200, x['status']))
-            
-            for result in sorted_results[:10]:
-                status = result['status']
-                status_style = "green" if status == 200 else "yellow" if status in [301, 302] else "red"
+            if status_counts:
+                self.console.print("\n[bold]Status Code Breakdown:[/bold]")
+                status_table = Table(show_header=True, box=None)
+                status_table.add_column("Status", style="cyan", width=10)
+                status_table.add_column("Count", style="yellow", width=10)
+                status_table.add_column("Description", style="dim")
                 
-                findings_table.add_row(
-                    result['path'],
-                    f"[{status_style}]{status}[/{status_style}]",
-                    f"{result.get('size', 0)} B",
-                    result.get('content_type', 'Unknown')
-                )
+                status_descriptions = {
+                    200: "OK - Success",
+                    301: "Moved Permanently",
+                    302: "Found (Redirect)",
+                    403: "Forbidden",
+                    401: "Unauthorized",
+                    500: "Internal Server Error"
+                }
+                
+                for status in sorted(status_counts.keys()):
+                    desc = status_descriptions.get(status, "Other")
+                    status_table.add_row(str(status), str(status_counts[status]), desc)
+                
+                self.console.print(status_table)
+        
+        # Top findings (limited to 20 lines)
+        if scan_response.results:
+            self.console.print("\n[bold]Top Findings (Limited to 20 lines):[/bold]")
             
-            self.console.print(findings_table)
+            # Group by status code
+            status_groups = {}
+            for result in scan_response.results:
+                status = result['status']
+                if status not in status_groups:
+                    status_groups[status] = []
+                status_groups[status].append(result)
             
-            if len(scan_response.results) > 10:
-                self.console.print(f"\n[dim]... and {len(scan_response.results) - 10} more findings[/dim]")
+            # Display with 20 line limit
+            lines_shown = 0
+            max_lines = 20
+            
+            for status in sorted(status_groups.keys()):
+                if lines_shown >= max_lines:
+                    break
+                
+                items = status_groups[status]
+                status_style = "green" if status == 200 else "yellow" if status in [301, 302] else "red" if status in [401, 403] else "dim"
+                
+                self.console.print(f"\n[{status_style}][{status}][/{status_style}] Status Code - {len(items)} found:")
+                lines_shown += 1
+                
+                # Create table for this status group
+                findings_table = Table(box=None, show_header=False, padding=(0, 2))
+                findings_table.add_column("Path", style="cyan", no_wrap=True)
+                findings_table.add_column("Size", justify="right", style="dim")
+                findings_table.add_column("Type", style="dim")
+                
+                # Show items for this status
+                items_to_show = min(len(items), max_lines - lines_shown)
+                for result in sorted(items, key=lambda x: x['path'])[:items_to_show]:
+                    findings_table.add_row(
+                        f"  {result['path']}",
+                        f"{result.get('size', 0)} B",
+                        result.get('content_type', '-')[:20]
+                    )
+                    lines_shown += 1
+                
+                self.console.print(findings_table)
+                
+                if len(items) > items_to_show:
+                    self.console.print(f"  [dim]... and {len(items) - items_to_show} more[/dim]")
+                    lines_shown += 1
+            
+            # Summary if truncated
+            if len(scan_response.results) > max_lines:
+                self.console.print(f"\n[dim](Showing {min(lines_shown, max_lines)} of {len(scan_response.results)} total results)[/dim]")
+            
+            # 301 Redirects section
+            results_301 = [r for r in scan_response.results if r.get('status') == 301]
+            if results_301:
+                self.console.print("\n[bold yellow]🔄 301 Redirects Found (Recursively Scanned):[/bold yellow]")
+                
+                for r301 in results_301[:5]:
+                    self.console.print(f"\n  [yellow]{r301['path']}[/yellow] → 301 Redirect")
+                    if r301.get('redirect'):
+                        self.console.print(f"    Redirects to: {r301['redirect']}")
+                    
+                    # Find paths discovered inside this 301 directory
+                    path_prefix = r301['path'].rstrip('/') + '/'
+                    children = [r for r in scan_response.results 
+                               if r['path'].startswith(path_prefix) and r['path'] != r301['path']]
+                    
+                    if children:
+                        self.console.print(f"    [green]Found {len(children)} hidden paths inside:[/green]")
+                        for child in children[:3]:
+                            status_icon = "🟢" if child['status'] == 200 else "🔴" if child['status'] == 403 else "🟡"
+                            self.console.print(f"      {status_icon} {child['path']} [{child['status']}]")
+                        if len(children) > 3:
+                            self.console.print(f"      ... and {len(children) - 3} more")
+                
+                if len(results_301) > 5:
+                    self.console.print(f"\n  [dim]... and {len(results_301) - 5} more 301 redirects[/dim]")
+            
+            # Directory tree visualization
+            if hasattr(self.dirsearch_engine, 'build_directory_tree'):
+                self.console.print("\n[bold]🌳 Directory Tree:[/bold]")
+                
+                # Convert results to format expected by engine
+                scan_results = []
+                for r in scan_response.results:
+                    from src.core.dirsearch_engine import ScanResult
+                    scan_results.append(ScanResult(
+                        url=r.get('url', ''),
+                        path=r.get('path', ''),
+                        status_code=r.get('status', 0),
+                        size=r.get('size', 0),
+                        is_directory=r.get('is_directory', False)
+                    ))
+                
+                tree_dict = self.dirsearch_engine.build_directory_tree(scan_results)
+                tree_str = self.dirsearch_engine.print_directory_tree(tree_dict)
+                
+                if tree_str:
+                    self.console.print(tree_str)
+                
+                # Directory statistics
+                stats = self.dirsearch_engine.get_directory_statistics(scan_results)
+                if stats:
+                    self.console.print(f"\n[bold]Directory Statistics:[/bold]")
+                    self.console.print(f"  • Directories: {stats['directories']}")
+                    self.console.print(f"  • Files: {stats['files']}")
+                    self.console.print(f"  • Max Depth: {stats['max_depth']}")
+                    if stats.get('deepest_path'):
+                        self.console.print(f"  • Deepest Path: {stats['deepest_path']}")
     
     def _serialize_target_info(self, target_info) -> Dict[str, Any]:
         """Convert TargetInfo to dict"""
@@ -1844,7 +2444,7 @@ Headers:
                 'extensions': config.get('extensions', []),
                 'threads': config.get('threads', 10),
                 'timeout': config.get('timeout', 10),
-                'follow_redirects': config.get('follow_redirects', True),
+                'follow_redirects': config.get('follow_redirects', False),
                 'exclude_status': config.get('exclude_status', '404'),
                 'user_agent': config.get('user_agent', 'Mozilla/5.0')
             }

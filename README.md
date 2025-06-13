@@ -2,24 +2,31 @@
 
 A powerful, multi-threaded directory and file enumeration tool enhanced with MCP (Machine Coordination Protocol) intelligence and AI agent integration for advanced web application scanning.
 
-## Features
+## 🚀 Key Features
 
-- **Dual Intelligence Modes**:
-  - **Local Mode**: Fast rule-based scanning with predefined logic
-  - **AI Agent Mode**: Enhanced scanning with ChatGPT/DeepSeek integration for intelligent decision making
+### Core Capabilities
+- **Smart Recursive Scanning**: Continues until no new content is found
+- **301 Redirect Handling**: Automatically discovers hidden files in redirected directories
+- **Deep Content Analysis**: Extracts hidden endpoints from HTML, JavaScript, and API responses
+- **Directory Tree Visualization**: Visual representation of discovered site structure
+- **Wildcard Detection**: Identifies and filters false positives
 
-- **Advanced Scanning Capabilities**:
-  - Multi-threaded concurrent scanning
-  - Automatic technology stack detection
-  - CMS identification (WordPress, Joomla, Drupal, etc.)
-  - Smart wordlist selection based on target analysis
-  - Dynamic parameter optimization
+### Intelligence Modes
+- **Local Mode**: Fast rule-based scanning with predefined logic
+- **AI Agent Mode**: Enhanced scanning with ChatGPT/DeepSeek integration
 
-- **Rich User Interface**:
-  - Interactive CLI with rich formatting
-  - Real-time progress tracking
-  - Color-coded output
-  - Multiple report formats (JSON, HTML, Markdown)
+### Advanced Features
+- **Multi-threaded Scanning**: Concurrent requests with configurable threads
+- **Technology Detection**: Automatic stack identification (WordPress, Laravel, etc.)
+- **Smart Wordlist Selection**: Context-aware wordlist choice based on target
+- **Multiple Authentication**: Basic, Digest, NTLM support
+- **Custom Headers & Cookies**: For bypassing WAF and authentication
+
+### User Experience
+- **Interactive CLI**: Rich formatting with color-coded output
+- **Real-time Progress**: Live updates with statistics
+- **Multiple Report Formats**: JSON, HTML, Markdown with directory trees
+- **Monster Mode**: Aggressive scanning with maximum coverage
 
 - **MCP Coordination**:
   - Intelligent scan planning
@@ -46,36 +53,54 @@ export OPENAI_API_KEY="your-openai-api-key"
 export DEEPSEEK_API_KEY="your-deepseek-api-key"
 ```
 
-## Usage
+## 🚀 Quick Start
 
-### Interactive Mode
-Launch the interactive menu:
+### Interactive Mode (Recommended)
 ```bash
 python main.py
 ```
+Choose from:
+1. **Quick Scan** - Automatic configuration
+2. **Standard Scan** - Balanced approach
+3. **Advanced Scan** - Full control
+4. **Monster Mode** - Maximum aggression
 
-### Quick Scan
-Let MCP automatically configure optimal parameters:
+### Direct Scanning
 ```bash
-python main.py -u https://example.com --quick
+# Quick scan with automatic configuration
+python scan_any_target.py http://example.com
+
+# Standard scan with common wordlist
+python scan_any_target.py http://example.com common 20
+
+# Comprehensive scan
+python scan_any_target.py http://example.com comprehensive 30
 ```
 
-### Custom Scan
-Specify your own parameters:
+## 📖 Usage Examples
+
+### Discover Hidden Files in 301 Redirects
 ```bash
-python main.py -u https://example.com -w custom_wordlist.txt -e php,html,js -t 20
+python main.py
+# Enable recursive scanning
+# Set follow_redirects = No
+# Watch for 301 paths being explored
 ```
 
-### AI-Enhanced Scan
-Use AI agent for intelligent scanning:
+### API Endpoint Discovery
 ```bash
-python main.py -u https://example.com --ai-provider openai --ai-key YOUR_KEY
+python main.py
+# Select wordlist: api-endpoints.txt
+# Add extensions: json,xml
+# Enable content analysis
 ```
 
-### Batch Scanning
-Scan multiple targets from a file:
+### WordPress Site Scanning
 ```bash
-python main.py -l targets.txt --report-format json -o ./reports
+python main.py
+# MCP will detect WordPress
+# Automatically use wordpress.txt
+# Find wp-admin, wp-content paths
 ```
 
 ## Command Line Options

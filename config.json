@@ -1,22 +1,49 @@
 {
-  "wordlists": {
-    "default": "/Users/datnlq/SecLists/Discovery/Web-Content/common.txt",
-    "paths": {
-      "seclists_common": "/Users/datnlq/SecLists/Discovery/Web-Content/common.txt",
-      "seclists_big": "/Users/datnlq/SecLists/Discovery/Web-Content/big.txt",
-      "seclists_medium": "/Users/datnlq/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt",
-      "seclists_small": "/Users/datnlq/SecLists/Discovery/Web-Content/directory-list-2.3-small.txt",
-      "seclists_php": "/Users/datnlq/SecLists/Discovery/Web-Content/PHP.fuzz.txt",
-      "seclists_apache": "/Users/datnlq/SecLists/Discovery/Web-Content/apache.txt",
-      "seclists_nginx": "/Users/datnlq/SecLists/Discovery/Web-Content/nginx.txt"
+  "paths": {
+    "wordlists": {
+      "general": "wordlists/general/",
+      "platform": "wordlists/platform/",
+      "specialized": "wordlists/specialized/"
+    },
+    "reports": "report/",
+    "logs": "log/",
+    "scripts": "scripts/",
+    "tests": {
+      "unit": "tests/unit/",
+      "integration": "tests/integration/",
+      "demos": "tests/demos/"
     }
   },
-  "scan_defaults": {
-    "threads": 20,
+  "default_scan_config": {
+    "threads": 10,
     "timeout": 10,
-    "extensions": ["php", "html", "js", "txt", "asp", "aspx", "jsp"],
-    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-    "follow_redirects": true,
-    "exclude_status": "404"
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "follow_redirects": false,
+    "max_retries": 3,
+    "delay": 0,
+    "batch_size": 50,
+    "rate_limit": null,
+    "recursion_depth": 3,
+    "detect_wildcards": true,
+    "exclude_status": [404],
+    "extensions": []
+  },
+  "ai_config": {
+    "openai_api_key": "",
+    "openai_model": "gpt-3.5-turbo",
+    "deepseek_api_key": "",
+    "deepseek_model": "deepseek-coder"
+  },
+  "wordlist_aliases": {
+    "common": "general/common.txt",
+    "big": "general/big.txt",
+    "comprehensive": "general/combined-enhanced.txt",
+    "monster": "general/monster-all.txt",
+    "wordpress": "platform/wordpress.txt",
+    "apache": "platform/apache.txt",
+    "nginx": "platform/nginx.txt",
+    "api": "specialized/api-endpoints.txt",
+    "backup": "specialized/critical-backup.txt",
+    "admin": "specialized/critical-admin.txt"
   }
 }

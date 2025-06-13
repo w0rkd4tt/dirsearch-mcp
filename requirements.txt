@@ -12,6 +12,7 @@ colorama>=0.4.6
 # Threading and async
 asyncio-throttle>=1.0.2
 aiofiles>=23.2.1
+nest-asyncio>=1.5.8  # Optional: for Jupyter notebook support
 
 # Parsing and validation
 beautifulsoup4>=4.12.2
@@ -22,6 +23,9 @@ validators>=0.22.0
 certifi>=2023.7.22
 chardet>=5.2.0
 dnspython>=2.4.2
+
+# Authentication
+httpx-ntlm>=1.2.0  # For NTLM authentication support
 
 # Data handling
 pyyaml>=6.0.1

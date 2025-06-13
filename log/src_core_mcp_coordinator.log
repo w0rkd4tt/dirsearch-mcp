@@ -80,3 +80,45 @@
 2025-06-12 11:24:25,319 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: 192.168.214.143/api
 2025-06-12 11:24:30,321 - src.core.mcp_coordinator - [33mWARNING[0m - analyze_target:344 - HTTP error analyzing target http://192.168.214.143/api: Connection timeout to host http://192.168.214.143/api
 2025-06-12 11:24:30,322 - src.core.mcp_coordinator - [32mINFO[0m - generate_scan_plan:457 - Generating scan plan
+2025-06-12 13:45:57,088 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 13:46:20,606 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://127.0.0.1:8080
+2025-06-12 13:47:12,966 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://127.0.0.1:8080/
+2025-06-12 14:01:17,408 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 14:02:15,778 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://127.0.0.1:8080/
+2025-06-12 14:13:46,789 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 14:14:06,989 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://127.0.0.1:8080/
+2025-06-12 14:31:51,554 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 14:32:14,507 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://127.0.0.1:8080/
+2025-06-12 14:45:12,768 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 14:45:55,392 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://challenge01.root-me.org/web-serveur/ch4/
+2025-06-12 14:48:57,383 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 14:49:15,199 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://challenge01.root-me.org/web-serveur/ch4/
+2025-06-12 15:18:26,129 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 15:18:47,439 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://challenge01.root-me.org/web-serveur/ch4/
+2025-06-12 15:24:53,430 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://challenge01.root-me.org/web-serveur/ch4/
+2025-06-12 15:41:35,151 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 15:41:43,049 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://challenge01.root-me.org/web-serveur/ch4/
+2025-06-12 15:41:43,507 - src.core.mcp_coordinator - [32mINFO[0m - generate_scan_plan:457 - Generating scan plan
+2025-06-12 15:46:34,286 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 15:46:53,668 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://challenge01.root-me.org/web-serveur/ch4/
+2025-06-12 16:42:13,869 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 16:42:30,358 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 16:42:55,260 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://challenge01.root-me.org/web-serveur/ch4/
+2025-06-12 17:02:01,585 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 17:02:26,052 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://challenge01.root-me.org/web-serveur/ch4/
+2025-06-12 18:07:38,213 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-12 18:08:17,540 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://challenge01.root-me.org/web-serveur/ch4/
+2025-06-13 11:23:21,157 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 11:23:49,486 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080/
+2025-06-13 13:42:04,018 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 13:42:17,205 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 13:42:38,635 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
+2025-06-13 13:59:07,228 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 13:59:23,941 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
+2025-06-13 14:12:08,085 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 14:12:26,097 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
+2025-06-13 14:39:11,622 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 14:39:35,186 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
+2025-06-13 14:40:00,952 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
+2025-06-13 15:06:45,742 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 15:25:23,469 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)

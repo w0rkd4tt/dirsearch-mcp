@@ -17,7 +17,7 @@ class Settings:
             'timeout': 10,
             'delay': 0,
             'user_agent': 'Mozilla/5.0 (compatible; Dirsearch-MCP/1.0)',
-            'follow_redirects': True,
+            'follow_redirects': False,  # Changed to False to capture 301 status
             'retry_attempts': 3,
             'exclude_status': '404',
             'include_status': None,
@@ -36,11 +36,23 @@ class Settings:
         }
         
         # Paths configuration
+        base_path = Path(__file__).parent.parent.parent
         self.paths = {
-            'wordlists': str(Path(__file__).parent.parent.parent / 'wordlists'),
-            'reports': str(Path(__file__).parent.parent.parent / 'report'),
-            'logs': str(Path(__file__).parent.parent.parent / 'log'),
-            'cache': str(Path(__file__).parent.parent.parent / '.cache')
+            'wordlists': {
+                'general': str(base_path / 'wordlists' / 'general'),
+                'platform': str(base_path / 'wordlists' / 'platform'),
+                'specialized': str(base_path / 'wordlists' / 'specialized'),
+                'base': str(base_path / 'wordlists')  # For backward compatibility
+            },
+            'reports': str(base_path / 'report'),
+            'logs': str(base_path / 'log'),
+            'cache': str(base_path / '.cache'),
+            'scripts': str(base_path / 'scripts'),
+            'tests': {
+                'unit': str(base_path / 'tests' / 'unit'),
+                'integration': str(base_path / 'tests' / 'integration'),
+                'demos': str(base_path / 'tests' / 'demos')
+            }
         }
         
         # Performance settings
