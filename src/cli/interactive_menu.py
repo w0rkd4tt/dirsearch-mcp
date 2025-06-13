@@ -2339,7 +2339,14 @@ Headers:
             # Group by status code
             status_groups = {}
             for result in scan_response.results:
-                status = result['status']
+                # Skip None results or invalid entries
+                if not result or not isinstance(result, dict):
+                    continue
+                    
+                status = result.get('status')
+                if status is None:
+                    continue
+                    
                 if status not in status_groups:
                     status_groups[status] = []
                 status_groups[status].append(result)
@@ -2366,11 +2373,13 @@ Headers:
                 
                 # Show items for this status
                 items_to_show = min(len(items), max_lines - lines_shown)
-                for result in sorted(items, key=lambda x: x['path'])[:items_to_show]:
+                # Filter out None items and ensure each item has required fields
+                valid_items = [item for item in items if item and isinstance(item, dict) and 'path' in item]
+                for result in sorted(valid_items, key=lambda x: x.get('path', ''))[:items_to_show]:
                     findings_table.add_row(
-                        f"  {result['path']}",
+                        f"  {result.get('path', 'Unknown')}",
                         f"{result.get('size', 0)} B",
-                        result.get('content_type', '-')[:20]
+                        str(result.get('content_type', '-'))[:20] if result.get('content_type') else '-'
                     )
                     lines_shown += 1
                 

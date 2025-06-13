@@ -416,20 +416,31 @@ class DirsearchEngine:
                     for suffix in options.suffixes:
                         path = f"{prefix}{base_path}{suffix}"
                         
+                        # Always add the path without extension (for directory scanning)
+                        paths.add(path)
+                        
+                        # Also add with trailing slash for explicit directory checking
+                        if not path.endswith('/'):
+                            paths.add(f"{path}/")
+                        
                         # Handle extensions (if not already handled by extension tag)
                         if options.extensions and options.extension_tag not in word:
                             for ext in options.extensions:
                                 paths.add(f"{path}.{ext}")
-                        else:
-                            paths.add(path)
                             
                         # Handle case variations
                         if options.uppercase:
                             paths.add(path.upper())
+                            if not path.endswith('/'):
+                                paths.add(f"{path.upper()}/")
                         if options.lowercase:
                             paths.add(path.lower())
+                            if not path.endswith('/'):
+                                paths.add(f"{path.lower()}/")
                         if options.capitalization:
                             paths.add(path.capitalize())
+                            if not path.endswith('/'):
+                                paths.add(f"{path.capitalize()}/")
                             
         return list(paths)
         
@@ -735,7 +746,12 @@ class DirsearchEngine:
             'directory listing',
             'parent directory',
             '<title>index of',
-            '<h1>index of'
+            '<h1>index of',
+            'directory contents',
+            '[dir]',
+            '[parent directory]',
+            'apache server at',
+            'nginx'
         ]
         
         if any(indicator in text for indicator in directory_indicators):
@@ -743,19 +759,37 @@ class DirsearchEngine:
             
         # Check if response is a redirect to path with trailing slash
         redirect_url = response_data.get('redirect_url', '')
-        if redirect_url and redirect_url.endswith(path + '/'):
+        if redirect_url:
+            # Handle both absolute and relative redirects
+            if redirect_url.endswith('/') or redirect_url.endswith(path + '/'):
+                return True
+            
+        # Check status code patterns
+        status_code = response_data.get('status_code')
+        
+        # 301/302 redirects often indicate directories
+        if status_code in [301, 302] and redirect_url and redirect_url.endswith('/'):
             return True
             
         # Check content type - directories often have text/html
         content_type = response_data.get('headers', {}).get('content-type', '')
-        status_code = response_data.get('status_code')
         
-        # If path has no extension and returns HTML, likely a directory
-        if (not any(path.endswith(ext) for ext in ['.php', '.html', '.htm', '.asp', '.aspx', '.jsp', '.txt', '.xml', '.json']) 
-            and 'text/html' in content_type 
-            and status_code in [200, 403]):
-            return True
-            
+        # If path has no extension and returns HTML or gets 403, likely a directory
+        path_parts = path.split('/')
+        last_part = path_parts[-1] if path_parts else ''
+        
+        # Check if last part has no extension (no dot or dot is at the beginning like .git)
+        has_no_extension = '.' not in last_part or last_part.startswith('.')
+        
+        if has_no_extension:
+            # Various indicators that suggest it's a directory
+            if status_code in [200, 301, 302, 403]:
+                if 'text/html' in content_type:
+                    return True
+                # 403 on extensionless paths often means directory access denied
+                if status_code == 403:
+                    return True
+                    
         return False
         
     def _should_include_result(
@@ -1471,13 +1505,13 @@ class DirsearchEngine:
         # Check for 403 wildcard pattern
         if len(responses) >= 2 and all(r['status_code'] == 403 for r in responses):
             # All random paths return 403 - likely wildcard
-            if len(sizes) == 1:  # All same size
+            if len(sizes) == 1 and sizes:  # All same size and not empty
                 if self.logger:
                     self.logger.warning(f"Detected 403 wildcard: all random paths return 403 with same size")
                 
                 wildcard_info[403] = {
                     'detected': True,
-                    'size': list(sizes)[0],
+                    'size': list(sizes)[0] if sizes else 0,
                     'parser': None
                 }
         
@@ -1876,9 +1910,18 @@ class DirsearchEngine:
         self._endpoint_analysis_results.extend(endpoint_analysis_results)
         
         # Now scan all newly discovered paths
-        if all_extracted_paths:
+        if all_extracted_paths and self._results:  # Check if we have results
             if self.logger:
                 self.logger.info(f"Total unique paths extracted: {len(all_extracted_paths)}")
+            
+            # Get base URL from first result or use the original base_url parameter
+            if self._results:
+                base_reference_url = self._results[0].url.rsplit('/', 1)[0] + '/'
+            else:
+                # This shouldn't happen but provide a fallback
+                if self.logger:
+                    self.logger.warning("No results available for base URL reference")
+                return
             
             # Group paths by their base directory
             paths_by_dir = defaultdict(list)
@@ -1890,14 +1933,14 @@ class DirsearchEngine:
                     base_dir = '/'
                 
                 # Check if path was already scanned
-                full_url = urljoin(self._results[0].url.rsplit('/', 1)[0] + '/', path)
+                full_url = urljoin(base_reference_url, path)
                 if full_url not in self._scanned_paths:
                     paths_by_dir[base_dir].append(path.split('/')[-1])
             
             # Scan the extracted paths
             for base_dir, paths in paths_by_dir.items():
                 if paths:
-                    base_url = urljoin(self._results[0].url.rsplit('/', 1)[0] + '/', base_dir)
+                    base_url = urljoin(base_reference_url, base_dir)
                     
                     if self.logger:
                         self.logger.info(f"Scanning {len(paths)} extracted paths in {base_dir}")
