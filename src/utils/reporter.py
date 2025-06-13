@@ -53,7 +53,7 @@ class ReportGenerator:
         """Generate JSON format report"""
         file_path = self.report_dir / 'json' / f"{base_name}.json"
         
-        # Convert any dataclasses to dicts
+        # Convert any dataclasses to dicts and clean non-serializable objects
         clean_data = self._clean_data_for_json(scan_data)
         
         # Extract scan configuration
@@ -207,14 +207,24 @@ class ReportGenerator:
     
     def _clean_data_for_json(self, data: Any) -> Any:
         """Recursively clean data for JSON serialization"""
+        # Skip DynamicContentParser objects
+        if type(data).__name__ == 'DynamicContentParser':
+            return None
+        
         if hasattr(data, '__dict__'):
-            return self._clean_data_for_json(asdict(data))
+            try:
+                return self._clean_data_for_json(asdict(data))
+            except:
+                # If asdict fails, convert to string
+                return str(data)
         elif isinstance(data, dict):
-            return {k: self._clean_data_for_json(v) for k, v in data.items()}
+            return {k: self._clean_data_for_json(v) for k, v in data.items() if v is not None}
         elif isinstance(data, list):
-            return [self._clean_data_for_json(item) for item in data]
+            return [self._clean_data_for_json(item) for item in data if item is not None]
         elif isinstance(data, (str, int, float, bool, type(None))):
             return data
+        elif isinstance(data, set):
+            return list(data)
         else:
             return str(data)
     

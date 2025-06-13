@@ -1238,6 +1238,9 @@ class InteractiveMenu:
                 if scan_type == "smart" and hasattr(self.dirsearch_engine, 'get_scan_insights'):
                     scan_data['intelligence_insights'] = self.dirsearch_engine.get_scan_insights()
                 
+                # Add scan configuration to scan_data
+                scan_data['scan_config'] = scan_config
+                
                 report_files = self.report_generator.generate_report(scan_data)
                 self.console.print("\n[green]✅ Reports saved:[/green]")
                 for format, path in report_files.items():

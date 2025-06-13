@@ -539,7 +539,8 @@ class DirsearchEngine:
                                     )
                                 
                                 # Intelligent analysis for important paths
-                                if result.status_code in [200, 301, 302, 403]:
+                                # Skip 403 as they are forbidden
+                                if result.status_code in [200, 301, 302]:
                                     self._analyze_and_expand(result)
                                 
                                 # Crawl response if enabled
@@ -795,12 +796,20 @@ class DirsearchEngine:
             initial_result_count = len(self._results)
             
             # Find all unscanned directories from ALL results (not just base_url)
+            # Skip 403 directories as they are forbidden
             all_directories = []
+            forbidden_directories = []
             for result in self._results:
-                if (result.status_code in [200, 301, 302, 403] and 
-                    result.is_directory and 
-                    result.url not in self._deep_scanned_dirs):
-                    all_directories.append(result)
+                if result.is_directory and result.url not in self._deep_scanned_dirs:
+                    if result.status_code in [200, 301, 302]:
+                        all_directories.append(result)
+                    elif result.status_code == 403:
+                        forbidden_directories.append(result)
+            
+            if forbidden_directories and self.logger:
+                self.logger.info(f"Skipping {len(forbidden_directories)} forbidden (403) directories")
+                for forbidden in forbidden_directories[:5]:  # Show first 5
+                    self.logger.debug(f"  - Skipped: {forbidden.path} (403 Forbidden)")
             
             if not all_directories:
                 if self.logger:
@@ -1815,7 +1824,7 @@ class DirsearchEngine:
         if self.debug_integration:
             self.debug_integration.log_recursion("[deep_analysis]", 0, starting=True)
         
-        # Get all successful endpoints (200, 301, 302)
+        # Get all successful endpoints (200, 301, 302) - excluding 403
         endpoints_to_analyze = [
             r for r in self._results 
             if r.status_code in [200, 301, 302] and r.url not in self._deep_analyzed_endpoints

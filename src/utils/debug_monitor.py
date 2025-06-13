@@ -398,13 +398,23 @@ class DebugMonitorIntegration:
             # Calculate response time
             response_time = (time.time() - start_time) * 1000  # Convert to ms
             
+            # Handle both dict and object responses
+            if isinstance(response, dict):
+                # Response is already a dictionary (from _make_request)
+                status_code = response.get('status_code')
+                response_size = response.get('size')
+            else:
+                # Response is an object (e.g., httpx.Response)
+                status_code = response.status_code
+                response_size = len(response.content) if hasattr(response, 'content') else None
+            
             # Log response received
             self.monitor.log_event(
                 EventType.RESPONSE_RECEIVED,
                 url=url,
                 path=path,
-                status_code=response.status_code,
-                response_size=len(response.content) if hasattr(response, 'content') else None,
+                status_code=status_code,
+                response_size=response_size,
                 response_time=response_time
             )
             

@@ -1,0 +1,40 @@
+{
+  "target": "http://localhost:8080",
+  "start_time": 1749821202.543485,
+  "stats": {
+    "total_requests": 18980,
+    "successful_responses": 0,
+    "errors": 18980,
+    "directories_found": 0,
+    "files_found": 0,
+    "filtered_paths": 0,
+    "wildcard_hits": 1,
+    "status_codes": {}
+  },
+  "events": [
+    {
+      "timestamp": 1749821202.543689,
+      "event_type": "scan_start",
+      "url": null,
+      "path": null,
+      "status_code": null,
+      "response_size": null,
+      "response_time": null,
+      "error": null,
+      "metadata": {
+        "target": "http://localhost:8080"
+      }
+    },
+    {
+      "timestamp": 1749821202.582237,
+      "event_type": "wildcard_detected",
+      "url": "http://localhost:8080",
+      "path": null,
+      "status_code": null,
+      "response_size": null,
+      "response_time": null,
+      "error": null,
+      "metadata": {
+        "404": {
+          "detected": true,
+          "parser": 
