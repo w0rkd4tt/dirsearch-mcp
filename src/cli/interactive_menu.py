@@ -339,7 +339,7 @@ class InteractiveMenu:
             # Build aggressive configuration
             config = {
                 # Use comprehensive bruteforce wordlist
-                'wordlist': 'monster-all.txt',  # Just the filename, not the path
+                'wordlist': 'general/monster-all.txt',  # Full path with subdirectory
                 'wordlist_type': 'enhanced',
                 'additional_wordlists': [],  # Already combined in monster-all.txt
                 
@@ -423,7 +423,7 @@ class InteractiveMenu:
             basic_table.add_column("Description", style="dim")
             
             basic_table.add_row("Target URL", target_url, "Base URL to attack")
-            basic_table.add_row("Wordlist", "monster-all.txt", "👹 ~6,800 unique paths")
+            basic_table.add_row("Wordlist", "general/monster-all.txt", "👹 Comprehensive wordlist")
             basic_table.add_row("Extensions", f"{len(config['extensions'])} types", ", ".join(config['extensions'][:10]) + "...")
             basic_table.add_row("Threads", str(config['threads']), "Maximum concurrent requests")
             basic_table.add_row("Timeout", f"{config['timeout']}s", "Per request timeout")
@@ -650,7 +650,13 @@ class InteractiveMenu:
         for i, (name, desc) in enumerate(wordlists[:-2], 1):
             # Get file size if it's a file
             size = ""
-            wordlist_path = Path(self.settings.paths.get('wordlists', 'wordlists')) / name
+            # Handle nested wordlists path structure
+            wordlists_path = self.settings.paths.get('wordlists', 'wordlists')
+            if isinstance(wordlists_path, dict):
+                # Use the 'base' path for backward compatibility
+                wordlists_path = wordlists_path.get('base', wordlists_path.get('general', 'wordlists'))
+            # Handle paths with subdirectories
+            wordlist_path = Path(wordlists_path) / name
             if wordlist_path.exists():
                 size = f"{wordlist_path.stat().st_size / 1024:.1f} KB"
             wordlist_table.add_row(str(i), name, desc, size)
@@ -703,30 +709,47 @@ class InteractiveMenu:
     def _get_available_wordlists(self) -> List[Tuple[str, str]]:
         """Get available wordlists with descriptions"""
         wordlists = [
-            ("monster-all.txt", "👹 MONSTER: All wordlists combined (~6800 entries)"),
-            ("combined-enhanced.txt", "Enhanced combined wordlist (recommended)"),
+            # These files actually exist
+            ("general/monster-all.txt", "👹 MONSTER: All wordlists combined (comprehensive)"),
+            ("general/combined-enhanced.txt", "Enhanced combined wordlist (recommended)"),
             ("api-endpoints.txt", "API-specific endpoints and nested paths"),
-            ("hidden-files.txt", "Hidden files and sensitive data"),
-            ("common.txt", "Common paths and files (~4700 entries)"),
-            ("directory-list-2.3-small.txt", "Small directory list (~87k entries)"),
-            ("directory-list-2.3-medium.txt", "Medium directory list (~220k entries)"),
-            ("php_common.txt", "PHP-specific paths"),
-            ("asp_common.txt", "ASP/ASPX paths"),
-            ("jsp_common.txt", "JSP/Java paths"),
-            ("wordpress.txt", "WordPress-specific paths"),
-            ("drupal.txt", "Drupal-specific paths"),
-            ("joomla.txt", "Joomla-specific paths"),
-            ("admin_panels.txt", "Admin interfaces"),
-            ("backup_files.txt", "Backup file patterns"),
-            ("sensitive_files.txt", "Sensitive file patterns")
+            ("specialized/hidden-files.txt", "Hidden files and sensitive data"),
+            ("critical-admin.txt", "Critical administrative paths"),
+            ("critical-api.txt", "Critical API endpoints"),
+            ("critical-backup.txt", "Critical backup file patterns"),
+            
+            # Common files that might be added later
+            ("common.txt", "Common paths and files"),
+            ("directory-list-2.3-small.txt", "Small directory list"),
+            ("directory-list-2.3-medium.txt", "Medium directory list"),
+            ("platform/php_common.txt", "PHP-specific paths"),
+            ("platform/asp_common.txt", "ASP/ASPX paths"),
+            ("platform/jsp_common.txt", "JSP/Java paths"),
+            ("platform/wordpress.txt", "WordPress-specific paths"),
+            ("platform/drupal.txt", "Drupal-specific paths"),
+            ("platform/joomla.txt", "Joomla-specific paths"),
+            ("specialized/admin_panels.txt", "Admin interfaces"),
+            ("specialized/backup_files.txt", "Backup file patterns"),
+            ("specialized/sensitive_files.txt", "Sensitive file patterns")
         ]
         
         # Filter existing files
         available = []
-        wordlist_dir = Path(self.settings.paths.get('wordlists', 'wordlists'))
+        # Handle nested wordlists path structure
+        wordlists_path = self.settings.paths.get('wordlists', 'wordlists')
+        if isinstance(wordlists_path, dict):
+            wordlists_path = wordlists_path.get('base', wordlists_path.get('general', 'wordlists'))
+        wordlist_dir = Path(wordlists_path)
         
         for name, desc in wordlists:
-            if (wordlist_dir / name).exists() or name == "common.txt":
+            # Handle paths with subdirectories
+            wordlist_path = wordlist_dir / name
+            
+            # Check if file exists
+            if wordlist_path.exists():
+                available.append((name, desc))
+            elif name == "common.txt":
+                # Always include common.txt as fallback
                 available.append((name, desc))
         
         return available
@@ -1443,7 +1466,11 @@ class InteractiveMenu:
         
         # Paths
         path_node = config_tree.add("📁 [cyan]Paths[/cyan]")
-        path_node.add(f"Wordlists: [blue]{self.settings.paths.get('wordlists', 'wordlists/')}[/blue]")
+        # Handle nested wordlists path structure
+        wordlists_path = self.settings.paths.get('wordlists', 'wordlists/')
+        if isinstance(wordlists_path, dict):
+            wordlists_path = wordlists_path.get('base', wordlists_path.get('general', 'wordlists/'))
+        path_node.add(f"Wordlists: [blue]{wordlists_path}[/blue]")
         path_node.add(f"Reports: [blue]{self.settings.paths.get('reports', 'report/')}[/blue]")
         path_node.add(f"Logs: [blue]{self.settings.paths.get('logs', 'log/')}[/blue]")
         
@@ -1630,7 +1657,11 @@ class InteractiveMenu:
         self.console.print("\n[bold cyan]Wordlist Management[/bold cyan]")
         self.console.print(Rule(style="cyan"))
         
-        wordlist_dir = Path(self.settings.paths.get('wordlists', 'wordlists'))
+        # Handle nested wordlists path structure
+        wordlists_path = self.settings.paths.get('wordlists', 'wordlists')
+        if isinstance(wordlists_path, dict):
+            wordlists_path = wordlists_path.get('base', wordlists_path.get('general', 'wordlists'))
+        wordlist_dir = Path(wordlists_path)
         
         # List current wordlists
         if wordlist_dir.exists():

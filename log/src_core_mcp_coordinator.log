@@ -122,3 +122,10 @@
 2025-06-13 14:40:00,952 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
 2025-06-13 15:06:45,742 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
 2025-06-13 15:25:23,469 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 19:21:20,618 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 19:22:01,072 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 19:22:16,998 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 19:31:06,895 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 19:31:23,519 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
+2025-06-13 19:37:57,543 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-13 19:38:17,934 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080

@@ -439,7 +439,7 @@ Examples:
                         'user_agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
                         'follow_redirects': True
                     }
-                    wordlist = 'critical-admin.txt'
+                    wordlist = 'critical-admin.txt'  # Located in wordlists root
                     # TODO: Add support for multiple wordlists in CLI mode
                     extensions = ['php', 'asp', 'aspx', 'jsp', 'html', 'json', 'xml', 'sql', 'zip', 'bak']
                     args.recursive = True
@@ -460,7 +460,7 @@ Examples:
                         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                         'follow_redirects': True
                     }
-                    wordlist = 'monster-all.txt'  # Just the filename, not the path
+                    wordlist = 'general/monster-all.txt'  # Full path with subdirectory
                     extensions = [
                         'php', 'html', 'htm', 'asp', 'aspx', 'jsp', 'jspx', 'do', 'action',
                         'pl', 'cgi', 'py', 'rb', 'js', 'css', 'xml', 'json', 'yaml', 'yml',

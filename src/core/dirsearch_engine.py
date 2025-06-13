@@ -1314,9 +1314,17 @@ class DirsearchEngine:
         if not wordlist_file.is_absolute():
             # Try to find in wordlists directory
             if self.settings and hasattr(self.settings, 'paths') and 'wordlists' in self.settings.paths:
+                # Handle nested wordlists path structure
+                wordlists_path = self.settings.paths['wordlists']
+                if isinstance(wordlists_path, dict):
+                    # Try different locations in order
+                    wordlists_base = wordlists_path.get('base', wordlists_path.get('general', 'wordlists'))
+                else:
+                    wordlists_base = wordlists_path
+                
                 # Remove 'wordlists/' prefix if present to avoid duplication
                 clean_path = wordlist_path.replace('wordlists/', '')
-                wordlist_file = Path(self.settings.paths['wordlists']) / clean_path
+                wordlist_file = Path(wordlists_base) / clean_path
                 if self.logger:
                     self.logger.debug(f"Resolved to: {wordlist_file}")
         
