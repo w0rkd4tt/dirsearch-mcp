@@ -720,9 +720,13 @@ class DirsearchEngine:
         # Detect if path is likely a directory
         is_directory = self._is_directory(path, response_data)
         
+        # Extract the full path from the URL (including prefix)
+        parsed_url = urlparse(url)
+        full_path = parsed_url.path
+        
         result = ScanResult(
             url=url,
-            path=path,
+            path=full_path,  # Use full path including prefix
             status_code=status_code,
             size=size,
             redirect_url=response_data.get('redirect_url'),

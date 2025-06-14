@@ -147,3 +147,5 @@
 2025-06-14 06:24:56,510 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
 2025-06-14 06:34:07,339 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
 2025-06-14 06:34:24,570 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
+2025-06-14 06:45:37,855 - src.core.mcp_coordinator - [32mINFO[0m - initialize:280 - Running in LOCAL mode (rule-based)
+2025-06-14 06:46:07,380 - src.core.mcp_coordinator - [32mINFO[0m - analyze_target:284 - Analyzing target: http://localhost:8080
